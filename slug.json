@@ -4,6 +4,7 @@
     "json2ify", 
     "jqueryify", 
     "spine",
+    "d3/d3",
     "spine/lib/local",
     "spine/lib/ajax",
     "spine/lib/route",
