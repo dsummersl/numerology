@@ -18,13 +18,11 @@ class App extends Spine.Controller
   constructor: ->
     super
     $.getJSON("data/computed.json", @dataloaded)
-    #NumberProperty.create(name: 'Zeisel',description: 'A number that falls into the pattern Px = aPx-1 + b.', source: '')
 
-  dataloaded: (d) ->
-    #console.log("loaded my data: "+d)
-    #$(@el).append("<br>#{k}") for k,v on d.tests
-    console.log "found = "+ $(@el).find('#currentNumber')
-    $(@el).find('#currentNumber').append("<ul><li>One</li></ul>")
+  dataloaded: (d) =>
+    $(@el).find('#currentNumber').append("<ul><li>#{d.tests[k].name}</li></ul>") for k,v of d.tests
+    for k,v of d.tests
+      NumberProperty.create(name: d.tests[k].name,description: d.tests[k].description, test: d.tests[k].test, numbers: d.tests[k].numbers)
 
 module.exports = App
     
