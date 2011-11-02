@@ -2,7 +2,12 @@ require('lib/setup')
 
 Spine = require('spine')
 
+TApp = require('models/App')
 NumberProperty = require('models/NumberProperty')
+CurrentNumber = require('controllers/CurrentNumber')
+CurrentDescs = require('controllers/CurrentDescs')
+NumberSelector = require('controllers/NumberSelector')
+
 #BloomFilter = require('bloomjs')
 
 ###
@@ -20,9 +25,13 @@ class App extends Spine.Controller
     $.getJSON("data/computed.json", @dataloaded)
 
   dataloaded: (d) =>
-    $(@el).find('#currentNumber').append("<ul><li>#{d.tests[k].name}</li></ul>") for k,v of d.tests
+    TApp.create(currentNumber: 1)
     for k,v of d.tests
       NumberProperty.create(name: d.tests[k].name,description: d.tests[k].description, test: d.tests[k].test, numbers: d.tests[k].numbers)
+    @cn = new CurrentNumber({el: $(@el).find('#currentNumber')})
+    @cd = new CurrentDescs({el: $(@el).find('#currentDescs')})
+    @ns = new NumberSelector({el: $(@el).find('#numberSelectors')})
+    
 
 module.exports = App
     
