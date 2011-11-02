@@ -1,8 +1,9 @@
+#BloomFilter = require('bloomjs')
 
 max = 100
 range = [1..max]
 
-# http://en.wikibooks.org/wiki/Efficient_Prime_Number_Generating_Algorithms
+# http://en.wikibooks.org/wiki/Efficient_Prime_Number_Generating_Algorithms# {{{
 primeBuilder = (max) ->
   primes = [3]
   potential = 3
@@ -18,8 +19,8 @@ primeBuilder = (max) ->
     primes.push(potential) if isprime
   primes.unshift(1)
   return primes
-
-# http://mathworld.wolfram.com/ZeiselNumber.html
+# }}}
+# http://mathworld.wolfram.com/ZeiselNumber.html# {{{
 zeiselBuilder = (primes,max) ->
   p_i = (i,a,b) -> a*i + b
   zeisels = []
@@ -32,7 +33,7 @@ zeiselBuilder = (primes,max) ->
         #console.log "zeisel #{p1}*#{p2}*#{p3} = #{p1*p2*p3} for #{a} and #{b}"
         zeisels.push(p1*p2*p3)
   return zeisels
-
+# }}}
 # figurative numbers: http://en.wikipedia.org/wiki/Figurate_number {{{
 # http://en.wikipedia.org/wiki/Triangular_number
 triangularBuilder = (max) ->
@@ -81,31 +82,106 @@ hexagonals = hexagonalBuilder(max)
 #console.log zeisels
 
 tests =
-  square: (n) ->
-    root = Math.sqrt(n)
-    #console.log (root - Math.floor(root))
-    return (root - Math.floor(root)) == 0
-  nonsquare: (n) -> !tests.square(n) || n == 1
-  prime: (n) -> n in primes
-  zeisel: (n) -> n in zeisels
-  triangular: (n) -> n in triangulars
-  pentagonal: (n) -> n in pentagonals
-  hexagonal: (n) -> n in hexagonals
+  even:
+    name: 'even'
+    computed: false
+    test: "(n) -> n % 2 == 0"
+  odd:
+    name: 'odd'
+    computed: false
+    test: "(n) -> n % 2 != 0"
+  square:
+    name: 'square'
+    computed: false
+    test: """(n) ->
+      root = Math.sqrt(n)
+      return (root - Math.floor(root)) == 0 """
+  nonsquare:
+    name: 'nonsquare'
+    computed: false
+    test: """(n) ->
+      root = Math.sqrt(n)
+      square = (root - Math.floor(root)) == 0
+      return !square || n == 1"""
+  prime:
+    name: 'prime'
+    computed: true
+    test: (n) -> n in primes
+  zeisel:
+    name: 'zeisel'
+    computed: true
+    test: (n) -> n in zeisels
+  triangular:
+    name: 'triangular'
+    computed: true
+    test: (n) -> n in triangulars
+  pentagonal:
+    name: 'pentagonal'
+    computed: true
+    test: (n) -> n in pentagonals
+  hexagonal:
+    name: 'hexagonal'
+    computed: true
+    test: (n) -> n in hexagonals
 
-generateTags = (n) =>
-  applicableTags = []
+#generateTags = (n,tests,bf) ->
+generateTags = (n,tests) ->
   for k,v of tests
-    applicableTags.push(k) if v(n)
-  return applicableTags
+    if tests[k].computed && tests[k].test(n)
+      tests[k].numbers.push(n)
+      #bf.add("#{k}-#{n}")
 
-for n in range
-  console.log "#{n},#{generateTags(n)}"
+# TODO an optimization: I could use a bloom filter for each computed value...insert it into the bloom filter
+# and then after all the computations retest all the integers up to the max and see if there are any false->positives
+# and include with the bloom filter an 'exception list': numbers that say they are true, but aren't.
 
-# dump out the extra numbers I may have computed
+tests[k].numbers = [] for k,v of tests
+
+#bf = new BloomFilter()
+#generateTags(n,tests,bf) for n in range
+generateTags(n,tests) for n in range
+
 ###
-for p in primes
-  console.log "#{p},prime" if p > max
-for z in zeisels
-  console.log "#{z},zeisel" if z > max
+#console.log("Review...")
+for k,v of tests
+  #console.log("looking at #{k}")
+  for n in range
+    if n in tests[k].numbers
+      inHash = bf.hasKey("#{k}-#{n}")
+      #console.log(" has #{n} - and #{inHash}")
+      if not inHash
+        console.log("ERROR: false positive for #{n}")
+  tests[k].numbers = [] # after verification, we can ditch it.
+
+console.log(" six is prime? #{tests.prime.bf.hasKey(6)}")
+console.log(" five is prime? #{tests.prime.bf.hasKey(5)}")
+data = ["0","0","0","1","0","0","0","0","0","0","0","0","0","0","0","0","1","1","1","0","0","0","1","1","1","1","1"]
+console.log(" rle: '#{JSON.stringify(BloomFilter.rle(data))}'")
+decoded = BloomFilter.unrle(BloomFilter.rle(data))
+console.log(" unrle = #{decoded}")
+console.log("  data = #{data}")
+i = 0
+while i < data.length
+  console.log ("bit #{i} #{data[i]} vs #{decoded[i]} is not the same") if data[i] != decoded[i]
+  i++
+
+bf = new BloomFilter({ filter: BloomFilter.rle(tests.prime.bf.filter)})
+#console.log(" rle = "+BloomFilter.rle(tests.prime.bf.filter))
+console.log(" six is prime? #{bf.hasKey(6)}")
+console.log(" five is prime? #{bf.hasKey(5)}")
+
+console.log "A: "+ BloomFilter.rle(tests.prime.bf.filter)
+console.log "B: "+ BloomFilter.rle(bf.filter)
 ###
+#i = 0
+#while i < tests.prime.bf.filter.length
+#  console.log ("bit #{i} #{data[i]} vs #{decoded[i]} is not the same") if tests.prime.bf.filter[i] != bf.filter[i]
+#  i++
+
+
+console.log JSON.stringify({
+  tests: tests
+  #filter: BloomFilter.rle(bf.filter)
+})
+
 # set vim: fdm=marker:

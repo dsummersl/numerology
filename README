@@ -1,0 +1,3 @@
+to compute the hard things:
+
+coffee app/lib/generatesources.coffee > public/data/computed.json 

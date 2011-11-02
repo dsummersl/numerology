@@ -11,5 +11,5 @@
     "spine/lib/tmpl",
     "spine/lib/manager"
   ],
-  "libs": []
+  "libs": [ ]
 }
