@@ -123,32 +123,32 @@ tests =
       result = !square || n == 1
     """
   prime:
-    name: 'prime'
+    name: 'Prime'
     description: 'Has no divisor other than itself and 1.'
     link: 'http://en.wikipedia.org/wiki/Prime_number'
     computed: true
     test: (n) -> n in primes
   zeisel:
-    name: 'zeisel'
+    name: 'Zeisel'
     description: 'A square free number that has at least three prime factors of the form <i>p</i><sub>x</sub> = <i>ap</i><sub>x-1</sub> + <i>b</i>.'
     link: 'http://en.wikipedia.org/wiki/Zeisel_number'
     computed: true
     test: (n) -> n in zeisels
   triangular:
     # TODO this wiki page has a pretty diagram - can I embed diagrams somehow?
-    name: 'triangular'
+    name: 'Triangular'
     description: 'TODO Can form an equilateral triangle in cannon ball formation.'
     link: 'http://en.wikipedia.org/wiki/Triangular_number'
     computed: true
     test: (n) -> n in triangulars
   pentagonal:
-    name: 'pentagonal'
+    name: 'Pentagonal'
     description: 'TODO A number that can form pentagonal shapes when evenly spaced.'
     link: 'http://en.wikipedia.org/wiki/Pentagonal_number'
     computed: true
     test: (n) -> n in pentagonals
   hexagonal:
-    name: 'hexagonal'
+    name: 'Hexagonal'
     description: 'TODO A number that form hexagonal shapes when evenly spaced.'
     link: 'http://en.wikipedia.org/wiki/Hexagonal_number'
     computed: true

@@ -1,18 +1,50 @@
 @import './mixin'
 
-.currentNumber {
+#header {
+  padding: 20px;
+}
+
+/* currentNumber */
+
+#currentNumber hr {
+  clear: both;
+}
+
+.navNumber {
   text-align: center;
-  font-size: 90px;
+  /* needed for proper aligning for some reason */
+  border: 1px solid white;
+  float: left;
+  width: 33%;
+}
+.navNumber h1 {
+  font-size: 150px;
+  padding: 2px;
+}
+#nextNumber,#previousNumber {
+  color: #ccc;
+}
+
+/* currentDescs */
+
+.numberType {
+  border: 1px solid #eee;
+  margin: 2px;
+  padding: 2px;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
 }
 
 .numberType .name {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .numberType .description {
-  font-size: 9px;
+  font-size: 10px;
 }
 
+/* code I was trying that would hide the description from non-definitions.
 .numberType .description {
   display: none;
 }
@@ -20,7 +52,27 @@
 .numberType.active .description {
   display: inline;
 }
+*/
 
-.numberType.active .name {
+.numberType .name {
   font-weight: bold;
 }
+
+.numberType .name {
+  color: #ccc;
+}
+.numberType .description {
+  color: #ccc;
+}
+
+.numberType.active {
+  background: #eee;
+}
+
+.numberType.active .name {
+  color: #000;
+}
+.numberType.active .description {
+  color: #000;
+}
+

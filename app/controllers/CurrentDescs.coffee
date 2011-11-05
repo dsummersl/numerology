@@ -6,9 +6,10 @@ NumberProperty = require('models/NumberProperty')
 class CurrentDescs extends Spine.Controller
   constructor: ->
     super
+    App.bind("update",@render)
     @render()
     
-  render: ->
+  render: =>
     @html require('views/CurrentDescs')({
       app: App.first()
       numbers: NumberProperty.all()

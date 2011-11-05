@@ -20,6 +20,9 @@ NumberSelector = require('controllers/NumberSelector')
 
 ###
 class App extends Spine.Controller
+  events:
+    "keydown": "rightOrLeft"
+
   constructor: ->
     super
     $.getJSON("data/computed.json", @dataloaded)
@@ -31,7 +34,18 @@ class App extends Spine.Controller
     @cn = new CurrentNumber({el: $(@el).find('#currentNumber')})
     @cd = new CurrentDescs({el: $(@el).find('#currentDescs')})
     @ns = new NumberSelector({el: $(@el).find('#numberSelectors')})
-    
+   
+  rightOrLeft: (evt) =>
+    @log "keypress going down"
+    if (evt.keyCode == 37) # left
+      current = TApp.first()
+      if (current.currentNumber > 0)
+        current.currentNumber--
+        current.save()
+    if (evt.keyCode == 39) # right
+      current = TApp.first()
+      current.currentNumber++
+      current.save()
 
 module.exports = App
     
