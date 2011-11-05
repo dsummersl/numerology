@@ -73,6 +73,9 @@ hexagonalBuilder = (max) ->
 # TODO Hardy–Ramanujan number (1729)
 # TODO taxicab number
 # TODO sphenic number
+# TODO automorphic number
+# TODO square triangular number
+# TODO natural numbers (or am I doing that anyway?)
 
 primes = primeBuilder(max*max)
 zeisels = zeiselBuilder(primes,max)
@@ -83,44 +86,71 @@ hexagonals = hexagonalBuilder(max)
 
 tests =
   even:
-    name: 'even'
+    name: 'Even'
+    description: 'Divisible by 2.'
+    link: 'http://en.wikipedia.org/wiki/Even_and_odd_numbers'
     computed: false
-    test: "(n) -> n % 2 == 0"
+    test: "result = n % 2 == 0"
+  singlyeven:
+    name: 'Singly Even'
+    description: 'Evenly divisble by 2, but not 4.'
+    link: 'http://en.wikipedia.org/wiki/Singly_even_number'
+    computed: false
+    test: "result = n % 2 == 0 && n % 4 != 0"
   odd:
-    name: 'odd'
+    name: 'Odd'
+    description: 'Not divisible by 2.'
+    link: 'http://en.wikipedia.org/wiki/Even_and_odd_numbers'
     computed: false
-    test: "(n) -> n % 2 != 0"
+    test: "result = n % 2 != 0"
   square:
-    name: 'square'
+    name: 'Perfect Square'
+    description: 'A product of some integer <i>k</i> squared.'
+    link: 'http://en.wikipedia.org/wiki/Square_number'
     computed: false
-    test: """(n) ->
+    test: """
       root = Math.sqrt(n)
-      return (root - Math.floor(root)) == 0 """
+      result = (root - Math.floor(root)) == 0
+    """
   nonsquare:
-    name: 'nonsquare'
+    name: 'Square Free'
+    description: 'Indivisible by a perfect square.'
+    link: 'http://en.wikipedia.org/wiki/Square-free_integer'
     computed: false
-    test: """(n) ->
+    test: """
       root = Math.sqrt(n)
       square = (root - Math.floor(root)) == 0
-      return !square || n == 1"""
+      result = !square || n == 1
+    """
   prime:
     name: 'prime'
+    description: 'Has no divisor other than itself and 1.'
+    link: 'http://en.wikipedia.org/wiki/Prime_number'
     computed: true
     test: (n) -> n in primes
   zeisel:
     name: 'zeisel'
+    description: 'A square free number that has at least three prime factors of the form <i>p</i><sub>x</sub> = <i>ap</i><sub>x-1</sub> + <i>b</i>.'
+    link: 'http://en.wikipedia.org/wiki/Zeisel_number'
     computed: true
     test: (n) -> n in zeisels
   triangular:
+    # TODO this wiki page has a pretty diagram - can I embed diagrams somehow?
     name: 'triangular'
+    description: 'TODO Can form an equilateral triangle in cannon ball formation.'
+    link: 'http://en.wikipedia.org/wiki/Triangular_number'
     computed: true
     test: (n) -> n in triangulars
   pentagonal:
     name: 'pentagonal'
+    description: 'TODO A number that can form pentagonal shapes when evenly spaced.'
+    link: 'http://en.wikipedia.org/wiki/Pentagonal_number'
     computed: true
     test: (n) -> n in pentagonals
   hexagonal:
     name: 'hexagonal'
+    description: 'TODO A number that form hexagonal shapes when evenly spaced.'
+    link: 'http://en.wikipedia.org/wiki/Hexagonal_number'
     computed: true
     test: (n) -> n in hexagonals
 
