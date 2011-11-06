@@ -1,6 +1,6 @@
 #BloomFilter = require('bloomjs')
 
-max = 100
+max = 10000
 range = [1..max]
 
 # http://en.wikibooks.org/wiki/Efficient_Prime_Number_Generating_Algorithms# {{{
@@ -76,6 +76,7 @@ hexagonalBuilder = (max) ->
 # TODO automorphic number
 # TODO square triangular number
 # TODO natural numbers (or am I doing that anyway?)
+# TODO titanic numbers
 
 primes = primeBuilder(max*max)
 zeisels = zeiselBuilder(primes,max)
