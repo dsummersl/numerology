@@ -28,4 +28,17 @@ class NumberProperty extends Spine.Model
         count++ if el.containsNumber(r++)
     return count
  
+  # get a list of the number/count and group numbers into bins (in which case things would be averaged).
+  @makeCountList: (first,last,grouping=1) ->
+    n = first
+    results = []
+    while n <= last
+      newval =
+        name: n
+        value: @totalCount(n)
+      results.push(newval)
+      n++
+    return results
+
+
 module.exports = NumberProperty

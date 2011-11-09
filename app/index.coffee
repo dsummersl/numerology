@@ -7,7 +7,6 @@ NumberProperty = require('models/NumberProperty')
 CurrentNumber = require('controllers/CurrentNumber')
 CurrentDescs = require('controllers/CurrentDescs')
 NumberSelector = require('controllers/NumberSelector')
-AppTests = require('controllers/AppTests')
 
 #BloomFilter = require('bloomjs')
 
@@ -35,7 +34,6 @@ class App extends Spine.Controller
     @cn = new CurrentNumber({el: $(@el).find('#currentNumber')})
     @cd = new CurrentDescs({el: $(@el).find('#currentDescs')})
     @ns = new NumberSelector({el: $(@el).find('#numberSelector')})
-    new AppTests()
    
   rightOrLeft: (evt) =>
     if (evt.keyCode == 37) # left

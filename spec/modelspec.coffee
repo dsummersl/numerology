@@ -28,3 +28,10 @@ describe 'NumberProperty', ->
     it 'can compute ranges of numbers', ->
       expect(NumberProperty.totalCount(2,3)).toEqual(4)
       expect(NumberProperty.totalCount(2,5)).toEqual(7)
+
+  describe 'makeCountList', ->
+    it 'should return the counts/numbers in a range', ->
+      list = NumberProperty.makeCountList(1,5)
+      expect(list.length).toEqual(5)
+      expect(list[0].name).toEqual(1)
+      expect(list[0].value).toEqual(2)
