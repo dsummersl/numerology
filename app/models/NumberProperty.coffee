@@ -9,7 +9,7 @@ class NumberProperty extends Spine.Model
   ###
 
   containsNumber: (n) ->
-    if @numbers.length > 0
+    if @numbers and @numbers.length > 0
       return n in @numbers
     else
       eval(@test)
@@ -17,12 +17,15 @@ class NumberProperty extends Spine.Model
 
   # the total number of properties that this #
   # has. In the case of a range, it would give you
-  # the average over a range.
+  # the total in the range
   @totalCount: (first,last = -1) ->
-    # TODO implement a range.
+    if last < first
+      last = first
     count = 0
-    for el in @all
-      count++ if el.containsNumber(first)
+    for el in @all()
+      r = first
+      while r <= last
+        count++ if el.containsNumber(r++)
     return count
  
 module.exports = NumberProperty
