@@ -1,1 +1,16 @@
-.currentNumber{text-align:center;font-size:90px}
+#header{padding:20px}
+#currentNumber hr{clear:both}
+.navNumber{text-align:center;border:1px solid #fff;float:left;width:33%}
+.navNumber h1{font-size:150px;padding:2px;margin-top:30px}
+#nextNumber,#previousNumber{color:#ccc}
+.numberType{border:1px solid #eee;margin:2px;padding:2px;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px}
+.numberType .name{font-size:10px}
+.numberType .description{font-size:10px}
+#currentDescs hr{clear:both;padding-top:5px}
+.numberType .name{font-weight:bold}
+.numberType .name{color:#ccc}
+.numberType .description{color:#ccc}
+.numberType.active{background:#eee}
+.numberType.active .name{color:#000}
+.numberType.active .description{color:#000}
+.rangeSelector{border:1px solid #000;text-align:center}

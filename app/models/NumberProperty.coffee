@@ -14,5 +14,15 @@ class NumberProperty extends Spine.Model
     else
       eval(@test)
       return result
+
+  # the total number of properties that this #
+  # has. In the case of a range, it would give you
+  # the average over a range.
+  @totalCount: (first,last = -1) ->
+    # TODO implement a range.
+    count = 0
+    for el in @all
+      count++ if el.containsNumber(first)
+    return count
  
 module.exports = NumberProperty

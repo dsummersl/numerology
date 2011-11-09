@@ -1,0 +1,32 @@
+<% rowsPerColumn = 4 %>
+<% count = 0 %>
+
+<% for el in @numbers: %>
+  <% if count == 0 || count % rowsPerColumn == 0: %>
+    <div class=span-one-third">
+    <!-- span8 -->
+  <% end %>
+
+  <% classParts = "numberType" %>
+  <% classParts += " active" if el.containsNumber @app.currentNumber %>
+
+  <div class="<%= classParts %>">
+    <p class="name"><%= el.name %></p>
+    <p class="description"><%- el.description %></p>
+  </div>
+
+  <% count++ %>
+  <% if count % rowsPerColumn == 0: %>
+    <!-- rowsPerColumn end -->
+    </div>
+  <% end %>
+<% end %>
+
+<% if count % rowsPerColumn != 0: %>
+  <!-- end end -->
+  </div>
+<% else: %>
+  <!-- no end -->
+<% end %>
+
+<hr/>

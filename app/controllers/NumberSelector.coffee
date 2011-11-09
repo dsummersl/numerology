@@ -1,4 +1,5 @@
 Spine = require('spine')
+D3 = require('d3/d3')
 
 ###
 two horizontal histograms:
@@ -11,5 +12,21 @@ two horizontal histograms:
 class NumberSelector extends Spine.Controller
   constructor: ->
     super
+    @width = 940
+    @height = 50
+    @upper =
+      start: 0
+      end: 500
+    @x = d3.scale.linear().domain([0,@upper.end]).range([0,@width])
+    @render()
+
+  render: =>
+    $(@el).empty()
+    $(@el).append("<div id='topSelector'></div>")
+    viz = d3.select('#topSelector')
+      .append("svg:svg")
+      .attr("width", @width)
+      .attr("height", @height)
+      .attr("class", "rangeSelector")
     
 module.exports = NumberSelector

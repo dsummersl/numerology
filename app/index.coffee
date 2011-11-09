@@ -7,6 +7,7 @@ NumberProperty = require('models/NumberProperty')
 CurrentNumber = require('controllers/CurrentNumber')
 CurrentDescs = require('controllers/CurrentDescs')
 NumberSelector = require('controllers/NumberSelector')
+AppTests = require('controllers/AppTests')
 
 #BloomFilter = require('bloomjs')
 
@@ -33,10 +34,10 @@ class App extends Spine.Controller
       NumberProperty.create(name: d.tests[k].name,description: d.tests[k].description, test: d.tests[k].test, numbers: d.tests[k].numbers)
     @cn = new CurrentNumber({el: $(@el).find('#currentNumber')})
     @cd = new CurrentDescs({el: $(@el).find('#currentDescs')})
-    @ns = new NumberSelector({el: $(@el).find('#numberSelectors')})
+    @ns = new NumberSelector({el: $(@el).find('#numberSelector')})
+    new AppTests()
    
   rightOrLeft: (evt) =>
-    @log "keypress going down"
     if (evt.keyCode == 37) # left
       current = TApp.first()
       if (current.currentNumber > 0)

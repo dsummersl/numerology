@@ -94,7 +94,7 @@ tests =
     test: "result = n % 2 == 0"
   singlyeven:
     name: 'Singly Even'
-    description: 'Evenly divisble by 2, but not 4.'
+    description: 'Evenly divisible by 2, but not 4.'
     link: 'http://en.wikipedia.org/wiki/Singly_even_number'
     computed: false
     test: "result = n % 2 == 0 && n % 4 != 0"
