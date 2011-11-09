@@ -9,5 +9,3 @@
 <div class="navNumber">
   <h1 id="nextNumber"><%= @currentNumber+1 %><h1>
 </div>
-
-<hr/>

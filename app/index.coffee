@@ -34,6 +34,7 @@ class App extends Spine.Controller
     @cn = new CurrentNumber({el: $(@el).find('#currentNumber')})
     @cd = new CurrentDescs({el: $(@el).find('#currentDescs')})
     @ns = new NumberSelector({el: $(@el).find('#numberSelector')})
+    @ns = new NumberSelector({el: $(@el).find('#numberSelector2'),start:1,end:1000})
    
   rightOrLeft: (evt) =>
     if (evt.keyCode == 37) # left
