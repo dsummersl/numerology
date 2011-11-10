@@ -18,15 +18,11 @@ class CurrentNumber extends Spine.Controller
 
   backOne: (evt) =>
     @log "back one"
-    current = App.first()
-    current.currentNumber--
-    current.save()
+    App.decrement()
 
   forwardOne: (evt) =>
     @log "for one"
-    current = App.first()
-    current.currentNumber++
-    current.save()
+    App.increment()
 
     
 module.exports = CurrentNumber

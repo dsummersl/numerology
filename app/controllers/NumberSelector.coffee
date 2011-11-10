@@ -30,8 +30,8 @@ class NumberSelector extends Spine.Controller
     bottomG = viz.data([0])
       .append('svg:g')
       .attr('transform', "translate(#{0},#{@height/2})")
-    @top = new Timeline(1,100,@width,@height/2,topG)
-    @bottom = new Timeline(1,1000,@width,@height/2,bottomG)
+    @top = new Timeline(1,100,@width,@height/2,topG,=> [App.first().currentNumber,App.first().currentNumber])
+    @bottom = new Timeline(1,1000,@width,@height/2,bottomG,=> [@top.start,@top.end])
     
   updated3: =>
     @top.updated3(this)
@@ -39,22 +39,25 @@ class NumberSelector extends Spine.Controller
 
 
 class Timeline
-  constructor: (@start,@end,@width,@height,@viz) ->
+  constructor: (@start,@end,@width,@height,@viz,@selectRange) ->
     @numProps = NumberProperty.all().length
-    numCounts = NumberProperty.makeCountList(@start,@end)
+    # TODO share this call - don't want to call it twice.
+    @numCounts = NumberProperty.makeCountList(@start,@end)
     @x = d3.scale.linear().domain([0,@end]).range([0,@width])
     @colors = d3.scale.linear().domain([0,@numProps]).range([0,1])
-    @viz.data([0]).selectAll('rect')
-      .data(numCounts)
+    @yoffset = 3
+    @viz.selectAll('rect')
+      .data(@numCounts)
       .enter()
       .append('svg:rect')
       .attr('fill',(d) => d3.hsl(0,0,1-@colors(d.value-1)))
       .attr('x', (d) => @x(d.name-1))
-      .attr('y', 0)
-      .attr('width', @x(1)+1 )
-      .attr('height', @height/2)
-    @viz.data([0]).selectAll('text')
-      .data([@start,@end])
+      .attr('y', (d) => if @btwn(d.name,@selectRange()) then 0 else @yoffset)
+      .attr('width', @x(1)+0.5 )
+      .attr('height', (d) => if @btwn(d.name,@selectRange()) then @height/2 else @height/2 - @yoffset)
+      .on('click', (d) => App.set(d.name))
+    @viz.selectAll('text')
+      .data([@start,@end]) # first number goes to the left, the other goes to the right
       .enter()
       .append('svg:text')
       .attr("transform", (d,i) => "translate(#{if i == 0 then 0 else @width},#{@height/2+20})")
@@ -62,8 +65,15 @@ class Timeline
       .attr('text-anchor',(d,i) => if i == 0 then 'after' else 'end')
       .text(String)
 
+  btwn: (num,range) -> return num >= range[0] and num <= range[1]
+
   updated3: (parent) =>
-    parent.log 'updating d3'
+    @viz.selectAll('rect')
+      .data(@numCounts)
+      .transition()
+      .duration(500)
+      .attr('y', (d) => if @btwn(d.name,@selectRange()) then 0 else @yoffset)
+      .attr('height', (d) => if @btwn(d.name,@selectRange()) then @height/2 else @height/2 - @yoffset)
 
 module.exports = NumberSelector
     
