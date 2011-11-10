@@ -12,17 +12,8 @@ class CurrentNumber extends Spine.Controller
     App.bind("update",@render)
     @render()
 
-  render: =>
-    @log "rendering #{App.first().currentNumber} for #{@el.attr('id')}"
-    @html require('views/CurrentNumber')(App.first())
-
-  backOne: (evt) =>
-    @log "back one"
-    App.decrement()
-
-  forwardOne: (evt) =>
-    @log "for one"
-    App.increment()
-
+  render: => @html require('views/CurrentNumber')(App.first())
+  backOne: (evt) => App.decrement() 
+  forwardOne: (evt) => App.increment()
     
 module.exports = CurrentNumber
