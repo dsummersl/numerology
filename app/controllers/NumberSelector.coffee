@@ -24,15 +24,17 @@ class NumberSelector extends Spine.Controller
       .attr("width", @width)
       .attr("height", @height)
       .attr("class", "rangeSelector")
+    @topMargin = 120
+    @bottomMargin = 10
     topG = viz.data([0])
       .append('svg:g')
-      .attr('transform', "translate(#{100},#{0})")
+      .attr('transform', "translate(#{@topMargin},#{0})")
     bottomG = viz.data([0])
       .append('svg:g')
-      .attr('transform', "translate(#{0},#{@height/2})")
+      .attr('transform', "translate(#{@bottomMargin},#{@height/2})")
     @numCounts = NumberProperty.makeCountList(1,5000)
-    @top = new Timeline(@width-200,@height/2,topG,@numCounts,NumberProperty.makeDataView(@numCounts,100))
-    @bottom = new Timeline(@width,@height/2,bottomG,@numCounts,NumberProperty.makeDataView(@numCounts,1000),true)
+    @top = new Timeline(@width-@topMargin*2,@height/2,topG,@numCounts,NumberProperty.makeDataView(@numCounts,100))
+    @bottom = new Timeline(@width-@bottomMargin*2,@height/2,bottomG,@numCounts,NumberProperty.makeDataView(@numCounts,1000),true)
     @joinG = viz.data([0]).append('svg:g')
     @pathGen = (d)->
       # http://www.w3.org/TR/SVG/paths.html#PathElement
@@ -40,23 +42,23 @@ class NumberSelector extends Spine.Controller
       # assume point 1 is above point 2:
       return "M#{d.p1[0]},#{d.p1[1]} C#{d.p1[0]},#{d.p1[1]+yoffset} #{d.p2[0]},#{d.p1[1]-yoffset} #{d.p2[0]},#{d.p2[1]}"
     @joinData = => [{ # left border of top histogram
-        p1: [@top.x(0)+100,0]
-        p2: [@top.x(0)+100,@top.height/2]
+        p1: [@top.x(0)+@topMargin,0]
+        p2: [@top.x(0)+@topMargin,@top.height/2]
       },{ # left connector between histograms
-        p1: [@top.x(0)+100,@top.height/2]
-        p2: [@bottom.x(@top.view.viewport[0]-1-@bottom.view.viewport[0]),@top.height+@bottom.yoffset]
+        p1: [@top.x(0)+@topMargin,@top.height/2]
+        p2: [@bottom.x(@top.view.viewport[0]-1-@bottom.view.viewport[0])+@bottomMargin,@top.height+@bottom.yoffset]
       },{ # right connector
-        p1: [@top.x(@top.view.size)+100,@top.height/2]
-        p2: [@bottom.x(@top.view.viewport[1]-@bottom.view.viewport[0]),@top.height+@bottom.yoffset]
+        p1: [@top.x(@top.view.size)+@topMargin,@top.height/2]
+        p2: [@bottom.x(@top.view.viewport[1]-@bottom.view.viewport[0])+@bottomMargin,@top.height+@bottom.yoffset]
       },{ # right border of top histogram
-        p1: [@top.x(@top.view.size)+100,0]
-        p2: [@top.x(@top.view.size)+100,@top.height/2]
+        p1: [@top.x(@top.view.size)+@topMargin,0]
+        p2: [@top.x(@top.view.size)+@topMargin,@top.height/2]
       },{ # left border of bottom histogram
-        p1: [@bottom.x(@top.view.viewport[0]-1-@bottom.view.viewport[0]),@top.height+@bottom.yoffset]
-        p2: [@bottom.x(@top.view.viewport[0]-1-@bottom.view.viewport[0]),@top.height+@bottom.height/2+@bottom.yoffset]
+        p1: [@bottom.x(@top.view.viewport[0]-1-@bottom.view.viewport[0])+@bottomMargin,@top.height+@bottom.yoffset]
+        p2: [@bottom.x(@top.view.viewport[0]-1-@bottom.view.viewport[0])+@bottomMargin,@top.height+@bottom.height/2+@bottom.yoffset]
       },{ # right border of bottom histogram
-        p1: [@bottom.x(@top.view.viewport[1]-@bottom.view.viewport[0]),@top.height+@bottom.yoffset]
-        p2: [@bottom.x(@top.view.viewport[1]-@bottom.view.viewport[0]),@top.height+@bottom.height/2+@bottom.yoffset]
+        p1: [@bottom.x(@top.view.viewport[1]-@bottom.view.viewport[0])+@bottomMargin,@top.height+@bottom.yoffset]
+        p2: [@bottom.x(@top.view.viewport[1]-@bottom.view.viewport[0])+@bottomMargin,@top.height+@bottom.height/2+@bottom.yoffset]
       }]
     @joinG.selectAll('path')
       .data(@joinData())
@@ -67,13 +69,6 @@ class NumberSelector extends Spine.Controller
       .attr('fill','none')
       .attr('width','1.5px')
 
-    ###
-    #.attr('x1', (d) => if d==0 then @top.x(0) else @top.x(@top.view.size))
-    #.attr('x2', (d) => if d==0 then @bottom.x(0) else @bottom.x(@top.view.size))
-    #.attr('y1', @top.height/2)
-    #.attr('y2', @top.height+@bottom.yoffset)
-    ###
-    
   updated3: =>
     @top.updated3()
     @bottom.updated3()
@@ -147,7 +142,6 @@ class Timeline
         .duration(@delay)
         .style('opacity',0)
         .remove()
-
       @doenter(rects,change)
         .style('opacity',.3)
         .transition()
