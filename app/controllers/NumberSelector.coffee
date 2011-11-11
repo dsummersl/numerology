@@ -30,9 +30,9 @@ class NumberSelector extends Spine.Controller
     bottomG = viz.data([0])
       .append('svg:g')
       .attr('transform', "translate(#{0},#{@height/2})")
-    @numCounts = NumberProperty.makeCountList(1,1000)
+    @numCounts = NumberProperty.makeCountList(1,5000)
     @top = new Timeline(@width-200,@height/2,topG,@numCounts,NumberProperty.makeDataView(@numCounts,100))
-    @bottom = new Timeline(@width,@height/2,bottomG,@numCounts,NumberProperty.makeDataView(@numCounts,600))
+    @bottom = new Timeline(@width,@height/2,bottomG,@numCounts,NumberProperty.makeDataView(@numCounts,1000))
     @joinG = viz.data([0]).append('svg:g')
     @pathGen = (d)->
       # http://www.w3.org/TR/SVG/paths.html#PathElement
@@ -104,7 +104,7 @@ class Timeline
     @view.recenter(App.num())
     delta = Math.abs(@view.viewport[0] - oldstart)
     change = if oldstart < @view.viewport[0] then delta else -delta
-    medelay = if change > @view.size then @delay * 3 else @delay
+    medelay = if change > @view.size then @delay * 2 else @delay
 
     @viz.selectAll('text')
       .data(@view.viewport) # first number goes to the left, the other goes to the right

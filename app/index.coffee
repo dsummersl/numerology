@@ -38,6 +38,7 @@ class App extends Spine.Controller
   rightOrLeft: (evt) =>
     TApp.decrement() if (evt.keyCode == 37) # left
     TApp.increment() if (evt.keyCode == 39) # right
+    # TODO page up and page down
 
 module.exports = App
     
