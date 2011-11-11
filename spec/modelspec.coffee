@@ -36,9 +36,9 @@ describe 'NumberProperty', ->
       expect(list[0].name).toEqual(1)
       expect(list[0].value).toEqual(2)
 
-  describe 'makeData', ->
+  describe 'makeDataView', ->
     list = NumberProperty.makeCountList(1,20)
-    data = NumberProperty.makeData(list,10)
+    data = NumberProperty.makeDataView(list,10)
 
     it 'will default to 1-size and will not move at the ends', ->
       expect(data.center).toEqual(1)
@@ -65,7 +65,7 @@ describe 'NumberProperty', ->
       expect(d.name for d in data.dataView()).toEqual([5,6,7,8,9,10,11,12,13,14])
 
     it 'will move correctly if the viewport is odd', ->
-      data = NumberProperty.makeData(list,11)
+      data = NumberProperty.makeDataView(list,11)
       data.recenter(10)
       expect(data.center).toEqual(10)
       expect(data.viewport).toEqual([5,15])

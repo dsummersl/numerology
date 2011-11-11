@@ -26,26 +26,27 @@ class NumberSelector extends Spine.Controller
       .attr("class", "rangeSelector")
     topG = viz.data([0])
       .append('svg:g')
-      .attr('transform', "translate(#{0},#{0})")
+      .attr('transform', "translate(#{100},#{0})")
     bottomG = viz.data([0])
       .append('svg:g')
       .attr('transform', "translate(#{0},#{@height/2})")
     @numCounts = NumberProperty.makeCountList(1,1000)
-    @top = new Timeline(@width,@height/2,topG,@numCounts,100,=> [1,100])
-    @bottom = new Timeline(@width,@height/2,bottomG,@numCounts,1000,=> [@top.start,@top.end])
+    @top = new Timeline(@width-200,@height/2,topG,@numCounts,NumberProperty.makeDataView(@numCounts,100))
+    @bottom = new Timeline(@width,@height/2,bottomG,@numCounts,NumberProperty.makeDataView(@numCounts,1000))
     @joinG = viz.data([0]).append('svg:g')
     @pathGen = (d)->
       # http://www.w3.org/TR/SVG/paths.html#PathElement
       yoffset = Math.abs(d.p1[1] - d.p2[1])/2
       return "M#{d.p1[0]},#{d.p1[1]} C#{d.p1[0]},#{d.p1[1]+yoffset} #{d.p2[0]},#{d.p1[1]+yoffset} #{d.p2[0]},#{d.p2[1]}"
-    @joinG.selectAll('path')
-      .data([{
-        p1: [@top.x(0),@top.height/2]
-        p2: [@bottom.x(0),@top.height+@bottom.yoffset]
+    @joinData = => [{
+        p1: [@top.x(0)+100,@top.height/2]
+        p2: [@bottom.x(@top.view.viewport[0]-1),@top.height+@bottom.yoffset]
       },{
-        p1: [@top.x(@top.selectRange()[1]),@top.height/2]
-        p2: [@bottom.x(@top.selectRange()[1]),@top.height+@bottom.yoffset]
-      }])
+        p1: [@top.x(@top.view.size)+100,@top.height/2]
+        p2: [@bottom.x(@top.view.viewport[1]),@top.height+@bottom.yoffset]
+      }]
+    @joinG.selectAll('path')
+      .data(@joinData())
       .enter()
       .append('svg:path')
       .attr('d',@pathGen)
@@ -54,8 +55,8 @@ class NumberSelector extends Spine.Controller
       .attr('width','1.5px')
 
     ###
-    #.attr('x1', (d) => if d==0 then @top.x(0) else @top.x(@top.numToShow))
-    #.attr('x2', (d) => if d==0 then @bottom.x(0) else @bottom.x(@top.numToShow))
+    #.attr('x1', (d) => if d==0 then @top.x(0) else @top.x(@top.view.size))
+    #.attr('x2', (d) => if d==0 then @bottom.x(0) else @bottom.x(@top.view.size))
     #.attr('y1', @top.height/2)
     #.attr('y2', @top.height+@bottom.yoffset)
     ###
@@ -64,42 +65,34 @@ class NumberSelector extends Spine.Controller
     @top.updated3()
     @bottom.updated3()
     @joinG.selectAll('path')
-      .data([{
-        p1: [@top.x(0),@top.height/2]
-        p2: [@bottom.x(0),@top.height+@bottom.yoffset]
-      },{
-        p1: [@top.x(@top.selectRange()[1]),@top.height/2]
-        p2: [@bottom.x(@top.selectRange()[1]),@top.height+@bottom.yoffset]
-      }])
+      .data(@joinData())
       .transition()
-      .duration(1000)
+      .duration(400)
       .attr('d',@pathGen)
 
 
 class Timeline
-  constructor: (@width,@height,@viz,@numCounts,@numToShow,@selectRange) ->
+  constructor: (@width,@height,@viz,@numCounts,@view) ->
     @numProps = NumberProperty.all().length
-    # TODO share this call - don't want to call it twice.
-    @x = d3.scale.linear().domain([0,@numToShow]).range([0,@width])
+    @x = d3.scale.linear().domain([0,@view.size]).range([0,@width])
     @colors = d3.scale.linear().domain([0,@numProps]).range([0,1])
     @yoffset = 5
-    @doenter(@viz.selectAll('rect').data(@numCounts[@selectRange[0]-1..@selectRange[1]-1], (d) -> d.name ))
-    ###
+    @delay = 400
+    @doenter(@viz.selectAll('rect').data(@view.dataView(), (d) -> d.name ))
     @viz.selectAll('text')
-      .data([@start,@end]) # first number goes to the left, the other goes to the right
+      .data(@view.viewport) # first number goes to the left, the other goes to the right
       .enter()
       .append('svg:text')
-      .attr("transform", (d,i) => "translate(#{if i == 0 then 0 else @width},#{@height/2+20})")
+      .attr("transform", (d,i) => "translate(#{if i == 0 then 0 else @width},#{@height/2+15})")
       .attr('class','numberbartext')
       .attr('text-anchor',(d,i) => if i == 0 then 'after' else 'end')
       .text(String)
-    ###
 
-  doenter: (rect,xtraval=1) =>
+  doenter: (rect,delta=0) =>
     rect.enter()
       .append('svg:rect')
       .attr('fill',(d) => d3.hsl(0,0,1-@colors(d.value-1)))
-      .attr('x', (d) => @x(d.name-xtraval))
+      .attr('x', (d) => @x(d.name-@view.viewport[0]+delta))
       .attr('y', (d) => if d.name == App.num() then 0 else @yoffset)
       .attr('width', @x(1)+0.5)
       .attr('height', (d) => if d.name == App.num() then @height/2 else @height/2 - @yoffset)
@@ -108,21 +101,46 @@ class Timeline
   btwn: (num,range) -> return num >= range[0] and num <= range[1]
 
   updated3: =>
-    rects = @viz.selectAll('rect')
-      .data(@numCounts[@selectRange[0]-1..@selectRange[1]-1], (d) -> d.name )
+    oldstart = @view.viewport[0]
+    @view.recenter(App.num())
+    delta = Math.abs(@view.viewport[0] - oldstart)
+    change = if oldstart < @view.viewport[0] then delta else -delta
+    medelay = if change > @view.size then @delay * change/@view.size else @delay
+
+    @viz.selectAll('text')
+      .data(@view.viewport) # first number goes to the left, the other goes to the right
       .transition()
-      .duration(400)
+      .text(String)
+
+    rects = @viz.selectAll('rect')
+      .data(@view.dataView(), (d) -> d.name )
+
+    rects.transition()
+      .duration(medelay)
+      .attr('x', (d) => @x(d.name-@view.viewport[0]))
       .attr('y', (d) => if d.name == App.num() then 0 else @yoffset)
       .attr('height', (d) => if d.name == App.num() then @height/2 else @height/2 - @yoffset)
 
-  ###
-  updated3: (parent) =>
-    @viz.selectAll('rect')
-      .data(@numCounts)
-      .transition()
-      .duration(200)
-      .attr('y', (d) => if d.name == App.num() then 0 else @yoffset)
-      .attr('height', (d) => if d.name == App.num() then @height/2 else @height/2 - @yoffset)
-  ###
+    if change != 0
+      rects.exit()
+        .transition()
+        .duration(medelay)
+        .attr('x', (d) => @x(d.name-@view.viewport[0]))
+        .style('opacity',.4)
+        .transition()
+        .delay(medelay)
+        .duration(medelay)
+        .style('opacity',0)
+        .remove()
+
+      @doenter(rects,change)
+        .style('opacity',.1)
+        .transition()
+        .duration(medelay)
+        .attr('x', (d) => @x(d.name-@view.viewport[0]))
+        .transition()
+        .delay(medelay)
+        .duration(medelay)
+        .style('opacity',1)
 
 module.exports = NumberSelector

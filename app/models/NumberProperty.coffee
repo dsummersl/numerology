@@ -40,7 +40,7 @@ class NumberProperty extends Spine.Model
       n++
     return results
 
-  @makeData: (data,size) -> new BoundedRange(data,size)
+  @makeDataView: (data,size) -> new BoundedRange(data,size)
 
 # A class that stores a list of data, and then gives you a 'view' of it, and provides a center
 #
