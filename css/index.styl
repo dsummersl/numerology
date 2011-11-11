@@ -1,9 +1,5 @@
 @import './mixin'
 
-#header {
-  padding: 20px;
-}
-
 /* currentNumber */
 
 #currentNumber hr {
@@ -20,7 +16,7 @@
 .navNumber h1 {
   font-size: 150px;
   padding: 2px;
-  margin-top: 30px;
+  margin-top: 50px;
 }
 #nextNumber,#previousNumber {
   color: #ccc;
@@ -39,11 +35,14 @@
 }
 
 .numberType .name {
-  font-size: 10px;
+  font-size: 12px;
+  margin-bottom: 0px;
 }
 
 .numberType .description {
-  font-size: 10px;
+  font-size: 11px;
+  margin-bottom: 0px;
+  line-height: 12px;
 }
 
 #currentDescs hr {
@@ -95,3 +94,11 @@
   fill: #999;
 }
 
+.selectedWedge {
+  stroke-width: 1;
+  stroke: black;
+  stroke-opacity: .3;
+}
+
+.unselectedWedge {
+}

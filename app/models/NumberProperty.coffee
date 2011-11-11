@@ -29,6 +29,7 @@ class NumberProperty extends Spine.Model
     return count
  
   # get a list of the number/count and group numbers into bins (in which case things would be averaged).
+  # TODO un-implemented grouping
   @makeCountList: (first,last,grouping=1) ->
     n = first
     results = []

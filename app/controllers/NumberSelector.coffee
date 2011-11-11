@@ -91,10 +91,11 @@ class Timeline
   doenter: (rect,delta=0) =>
     rect.enter()
       .append('svg:rect')
-      .attr('fill',(d) => d3.hsl(0,0,1-@colors(d.value-1)))
+      .attr('fill',(d) => d3.hsl(0,0,1-@colors(d.value)))
       .attr('x', (d) => @x(d.name-@view.viewport[0]+delta))
       .attr('y', (d) => if d.name == App.num() then 0 else @yoffset)
-      .attr('width', @x(1)+0.5)
+      .attr('class', (d) => if d.name == App.num() then 'selectedWedge' else 'unselectedWedge')
+      .attr('width', @x(1))
       .attr('height', (d) => if d.name == App.num() then @height/2 else @height/2 - @yoffset)
       .on('click', (d) => App.set(d.name))
 
@@ -117,6 +118,7 @@ class Timeline
       .duration(medelay)
       .attr('x', (d) => @x(d.name-@view.viewport[0]))
       .attr('y', (d) => if d.name == App.num() then 0 else @yoffset)
+      .attr('class', (d) => if d.name == App.num() then 'selectedWedge' else 'unselectedWedge')
       .attr('height', (d) => if d.name == App.num() then @height/2 else @height/2 - @yoffset)
 
     if change != 0
