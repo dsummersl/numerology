@@ -35,3 +35,41 @@ describe 'NumberProperty', ->
       expect(list.length).toEqual(5)
       expect(list[0].name).toEqual(1)
       expect(list[0].value).toEqual(2)
+
+  describe 'makeData', ->
+    list = NumberProperty.makeCountList(1,20)
+    data = NumberProperty.makeData(list,10)
+
+    it 'will default to 1-size and will not move at the ends', ->
+      expect(data.center).toEqual(1)
+      expect(data.viewport).toEqual([1,10])
+      expect(d.name for d in data.dataView()).toEqual([1,2,3,4,5,6,7,8,9,10])
+      data.recenter(2)
+      expect(data.center).toEqual(2)
+      expect(data.viewport).toEqual([1,10])
+      data.recenter(5)
+      expect(data.center).toEqual(5)
+      expect(data.viewport).toEqual([1,10])
+      data.recenter(16)
+      expect(data.center).toEqual(16)
+      expect(data.viewport).toEqual([11,20])
+      data.recenter(19)
+      expect(data.center).toEqual(19)
+      expect(data.viewport).toEqual([11,20])
+      expect(d.name for d in data.dataView()).toEqual([11,12,13,14,15,16,17,18,19,20])
+
+    it 'will move the viewport to center if possible', ->
+      data.recenter(10)
+      expect(data.center).toEqual(10)
+      expect(data.viewport).toEqual([5,14])
+      expect(d.name for d in data.dataView()).toEqual([5,6,7,8,9,10,11,12,13,14])
+
+    it 'will move correctly if the viewport is odd', ->
+      data = NumberProperty.makeData(list,11)
+      data.recenter(10)
+      expect(data.center).toEqual(10)
+      expect(data.viewport).toEqual([5,15])
+      expect(d.name for d in data.dataView()).toEqual([5,6,7,8,9,10,11,12,13,14,15])
+      data.recenter(18)
+      expect(data.viewport).toEqual([10,20])
+

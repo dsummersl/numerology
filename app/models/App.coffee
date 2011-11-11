@@ -18,4 +18,6 @@ class App extends Spine.Model
     current.currentNumber = n
     current.save()
 
+  @num: -> @first().currentNumber
+
 module.exports = App

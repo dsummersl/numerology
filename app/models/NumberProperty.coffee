@@ -40,5 +40,31 @@ class NumberProperty extends Spine.Model
       n++
     return results
 
+  @makeData: (data,size) -> new BoundedRange(data,size)
+
+# A class that stores a list of data, and then gives you a 'view' of it, and provides a center
+#
+# Attributes:
+#  - data: the underlying data.
+#  - viewport: a range always equal to size.
+#  - center: where the main view is in the middle of the viewport.
+class BoundedRange
+  # defaults the v
+  constructor: (@data,@size) ->
+    @viewport = [1,@size]
+    @center = 1
+
+  dataView: -> @data[@viewport[0]-1..@viewport[1]-1]
+
+  recenter: (n) ->
+    @center = n
+    start = 1
+    end = @size
+    start = n-Math.floor(@size/2) if n > @size/2
+    end = n+Math.ceil(@size/2)-1 if n > @size/2
+    if end > @data.length
+      start = @data.length - @size + 1
+      end = @data.length
+    @viewport = [start,end]
 
 module.exports = NumberProperty
