@@ -3,14 +3,14 @@ Spine = require('spine')
 class App extends Spine.Model
   @configure 'App','currentNumber'
   
-  @increment: ->
+  @increment: (n=1) ->
     current = @first()
-    current.currentNumber++
+    current.currentNumber += n
     current.save()
 
-  @decrement: ->
+  @decrement: (n=1) ->
     current = @first()
-    current.currentNumber--
+    current.currentNumber -= n
     current.currentNumber = 1 if current.currentNumber < 1
     current.save()
 

@@ -32,18 +32,31 @@ class NumberSelector extends Spine.Controller
       .attr('transform', "translate(#{0},#{@height/2})")
     @numCounts = NumberProperty.makeCountList(1,5000)
     @top = new Timeline(@width-200,@height/2,topG,@numCounts,NumberProperty.makeDataView(@numCounts,100))
-    @bottom = new Timeline(@width,@height/2,bottomG,@numCounts,NumberProperty.makeDataView(@numCounts,1000))
+    @bottom = new Timeline(@width,@height/2,bottomG,@numCounts,NumberProperty.makeDataView(@numCounts,1000),true)
     @joinG = viz.data([0]).append('svg:g')
     @pathGen = (d)->
       # http://www.w3.org/TR/SVG/paths.html#PathElement
-      yoffset = Math.abs(d.p1[1] - d.p2[1])/2
-      return "M#{d.p1[0]},#{d.p1[1]} C#{d.p1[0]},#{d.p1[1]+yoffset} #{d.p2[0]},#{d.p1[1]+yoffset} #{d.p2[0]},#{d.p2[1]}"
-    @joinData = => [{
+      yoffset = Math.abs(d.p1[1] - d.p2[1])/3
+      # assume point 1 is above point 2:
+      return "M#{d.p1[0]},#{d.p1[1]} C#{d.p1[0]},#{d.p1[1]+yoffset} #{d.p2[0]},#{d.p1[1]-yoffset} #{d.p2[0]},#{d.p2[1]}"
+    @joinData = => [{ # left border of top histogram
+        p1: [@top.x(0)+100,0]
+        p2: [@top.x(0)+100,@top.height/2]
+      },{ # left connector between histograms
         p1: [@top.x(0)+100,@top.height/2]
         p2: [@bottom.x(@top.view.viewport[0]-1-@bottom.view.viewport[0]),@top.height+@bottom.yoffset]
-      },{
+      },{ # right connector
         p1: [@top.x(@top.view.size)+100,@top.height/2]
         p2: [@bottom.x(@top.view.viewport[1]-@bottom.view.viewport[0]),@top.height+@bottom.yoffset]
+      },{ # right border of top histogram
+        p1: [@top.x(@top.view.size)+100,0]
+        p2: [@top.x(@top.view.size)+100,@top.height/2]
+      },{ # left border of bottom histogram
+        p1: [@bottom.x(@top.view.viewport[0]-1-@bottom.view.viewport[0]),@top.height+@bottom.yoffset]
+        p2: [@bottom.x(@top.view.viewport[0]-1-@bottom.view.viewport[0]),@top.height+@bottom.height/2+@bottom.yoffset]
+      },{ # right border of bottom histogram
+        p1: [@bottom.x(@top.view.viewport[1]-@bottom.view.viewport[0]),@top.height+@bottom.yoffset]
+        p2: [@bottom.x(@top.view.viewport[1]-@bottom.view.viewport[0]),@top.height+@bottom.height/2+@bottom.yoffset]
       }]
     @joinG.selectAll('path')
       .data(@joinData())
@@ -72,21 +85,22 @@ class NumberSelector extends Spine.Controller
 
 
 class Timeline
-  constructor: (@width,@height,@viz,@numCounts,@view) ->
+  constructor: (@width,@height,@viz,@numCounts,@view,@showNumbers=false) ->
     @numProps = NumberProperty.all().length
     @x = d3.scale.linear().domain([0,@view.size]).range([0,@width])
     @colors = d3.scale.linear().domain([0,@numProps]).range([0,1])
     @yoffset = 5
     @delay = 400
     @doenter(@viz.selectAll('rect').data(@view.dataView(), (d) -> d.name ))
-    @viz.selectAll('text')
-      .data(@view.viewport) # first number goes to the left, the other goes to the right
-      .enter()
-      .append('svg:text')
-      .attr("transform", (d,i) => "translate(#{if i == 0 then 0 else @width},#{@height/2+15})")
-      .attr('class','numberbartext')
-      .attr('text-anchor',(d,i) => if i == 0 then 'after' else 'end')
-      .text(String)
+    if @showNumbers
+      @viz.selectAll('text')
+        .data(@view.viewport) # first number goes to the left, the other goes to the right
+        .enter()
+        .append('svg:text')
+        .attr("transform", (d,i) => "translate(#{if i == 0 then 0 else @width},#{@height/2+15})")
+        .attr('class','numberbartext')
+        .attr('text-anchor',(d,i) => if i == 0 then 'after' else 'end')
+        .text(String)
 
   doenter: (rect,delta=0) =>
     rect.enter()
@@ -106,10 +120,11 @@ class Timeline
     change = if oldstart < @view.viewport[0] then delta else -delta
     medelay = if change > @view.size then @delay * 2 else @delay
 
-    @viz.selectAll('text')
-      .data(@view.viewport) # first number goes to the left, the other goes to the right
-      .transition()
-      .text(String)
+    if @showNumbers
+      @viz.selectAll('text')
+        .data(@view.viewport) # first number goes to the left, the other goes to the right
+        .transition()
+        .text(String)
 
     rects = @viz.selectAll('rect')
       .data(@view.dataView(), (d) -> d.name )
@@ -134,7 +149,7 @@ class Timeline
         .remove()
 
       @doenter(rects,change)
-        .style('opacity',.1)
+        .style('opacity',.3)
         .transition()
         .duration(medelay)
         .attr('x', (d) => @x(d.name-@view.viewport[0]))
