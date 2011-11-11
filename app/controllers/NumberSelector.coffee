@@ -30,9 +30,9 @@ class NumberSelector extends Spine.Controller
     bottomG = viz.data([0])
       .append('svg:g')
       .attr('transform', "translate(#{0},#{@height/2})")
-    @numCounts = NumberProperty.makeCountList(1,1000)
+    @numCounts = NumberProperty.makeCountList(1,10000)
     @top = new Timeline(@width-200,@height/2,topG,@numCounts,NumberProperty.makeDataView(@numCounts,100))
-    @bottom = new Timeline(@width,@height/2,bottomG,@numCounts,NumberProperty.makeDataView(@numCounts,1000))
+    @bottom = new Timeline(@width,@height/2,bottomG,@numCounts,NumberProperty.makeDataView(@numCounts,600))
     @joinG = viz.data([0]).append('svg:g')
     @pathGen = (d)->
       # http://www.w3.org/TR/SVG/paths.html#PathElement
@@ -40,10 +40,10 @@ class NumberSelector extends Spine.Controller
       return "M#{d.p1[0]},#{d.p1[1]} C#{d.p1[0]},#{d.p1[1]+yoffset} #{d.p2[0]},#{d.p1[1]+yoffset} #{d.p2[0]},#{d.p2[1]}"
     @joinData = => [{
         p1: [@top.x(0)+100,@top.height/2]
-        p2: [@bottom.x(@top.view.viewport[0]-1),@top.height+@bottom.yoffset]
+        p2: [@bottom.x(@top.view.viewport[0]-1-@bottom.view.viewport[0]),@top.height+@bottom.yoffset]
       },{
         p1: [@top.x(@top.view.size)+100,@top.height/2]
-        p2: [@bottom.x(@top.view.viewport[1]),@top.height+@bottom.yoffset]
+        p2: [@bottom.x(@top.view.viewport[1]-@bottom.view.viewport[0]),@top.height+@bottom.yoffset]
       }]
     @joinG.selectAll('path')
       .data(@joinData())
@@ -98,14 +98,12 @@ class Timeline
       .attr('height', (d) => if d.name == App.num() then @height/2 else @height/2 - @yoffset)
       .on('click', (d) => App.set(d.name))
 
-  btwn: (num,range) -> return num >= range[0] and num <= range[1]
-
   updated3: =>
     oldstart = @view.viewport[0]
     @view.recenter(App.num())
     delta = Math.abs(@view.viewport[0] - oldstart)
     change = if oldstart < @view.viewport[0] then delta else -delta
-    medelay = if change > @view.size then @delay * change/@view.size else @delay
+    medelay = if change > @view.size then @delay * 3 else @delay
 
     @viz.selectAll('text')
       .data(@view.viewport) # first number goes to the left, the other goes to the right
@@ -129,7 +127,7 @@ class Timeline
         .style('opacity',.4)
         .transition()
         .delay(medelay)
-        .duration(medelay)
+        .duration(@delay)
         .style('opacity',0)
         .remove()
 
@@ -140,7 +138,7 @@ class Timeline
         .attr('x', (d) => @x(d.name-@view.viewport[0]))
         .transition()
         .delay(medelay)
-        .duration(medelay)
+        .duration(@delay)
         .style('opacity',1)
 
 module.exports = NumberSelector

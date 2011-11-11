@@ -36,15 +36,8 @@ class App extends Spine.Controller
     @ns = new NumberSelector({el: $(@el).find('#numberSelector')})
    
   rightOrLeft: (evt) =>
-    if (evt.keyCode == 37) # left
-      current = TApp.first()
-      if (current.currentNumber > 0)
-        current.currentNumber--
-        current.save()
-    if (evt.keyCode == 39) # right
-      current = TApp.first()
-      current.currentNumber++
-      current.save()
+    TApp.decrement() if (evt.keyCode == 37) # left
+    TApp.increment() if (evt.keyCode == 39) # right
 
 module.exports = App
     

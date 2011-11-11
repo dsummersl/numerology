@@ -13,7 +13,7 @@ class CurrentNumber extends Spine.Controller
     @render()
 
   render: => @html require('views/CurrentNumber')(App.first())
-  backOne: (evt) => App.decrement() 
+  backOne: (evt) => App.decrement()
   forwardOne: (evt) => App.increment()
     
 module.exports = CurrentNumber
