@@ -5,3 +5,7 @@ coffee app/lib/generatesources.coffee > public/data/computed.json
 TODO currently computing from 1-100k takes a long time. Like...
  - it doesn't work at 100k. It takes 75 minutes and doesn't work.
  - takes 7 minutes at 10k.
+
+To test:
+
+cake test

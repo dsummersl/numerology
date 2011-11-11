@@ -30,7 +30,7 @@ class NumberSelector extends Spine.Controller
     bottomG = viz.data([0])
       .append('svg:g')
       .attr('transform', "translate(#{0},#{@height/2})")
-    @numCounts = NumberProperty.makeCountList(1,10000)
+    @numCounts = NumberProperty.makeCountList(1,1000)
     @top = new Timeline(@width-200,@height/2,topG,@numCounts,NumberProperty.makeDataView(@numCounts,100))
     @bottom = new Timeline(@width,@height/2,bottomG,@numCounts,NumberProperty.makeDataView(@numCounts,600))
     @joinG = viz.data([0]).append('svg:g')
