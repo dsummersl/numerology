@@ -10,6 +10,7 @@
     "spine/lib/ajax",
     "spine/lib/route",
     "spine/lib/tmpl",
+    "spine/lib/relation",
     "spine/lib/manager"
   ],
   "libs": [ ]

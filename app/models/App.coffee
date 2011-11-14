@@ -1,7 +1,9 @@
 Spine = require('spine')
+NumberProperty = require('models/NumberProperty')
 
 class App extends Spine.Model
   @configure 'App','currentNumber'
+  #@hasMany 'numberProperties', NumberProperty
   
   @increment: (n=1) ->
     current = @first()

@@ -1,7 +1,9 @@
 Spine = require('spine')
+App = require('models/App')
 
 class NumberProperty extends Spine.Model
   @configure 'NumberProperty','name','description','test','numbers'
+  #@belongsTo 'app', App
   
   ###
   # Make a method that checks for the properties defined for a number

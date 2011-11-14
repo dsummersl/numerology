@@ -38,7 +38,7 @@ class NumberSelector extends Spine.Controller
     @joinG = viz.data([0]).append('svg:g')
     @pathGen = (d)->
       # http://www.w3.org/TR/SVG/paths.html#PathElement
-      yoffset = Math.abs(d.p1[1] - d.p2[1])/3
+      yoffset = Math.abs(d.p1[1] - d.p2[1])/3 + 3
       # assume point 1 is above point 2:
       return "M#{d.p1[0]},#{d.p1[1]} C#{d.p1[0]},#{d.p1[1]+yoffset} #{d.p2[0]},#{d.p1[1]-yoffset} #{d.p2[0]},#{d.p2[1]}"
     @joinData = => [{ # left border of top histogram

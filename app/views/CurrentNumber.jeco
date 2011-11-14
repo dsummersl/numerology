@@ -1,13 +1,3 @@
 <div class="navNumber">
-<% if @currentNumber > 1: %>
-  <!--<h1 id="previousNumber"><%= @currentNumber-1 %></h1>-->
-<% end %>
-  <h1 id="previousNumber">_</h1>
-</div>
-<div class="navNumber">
   <h1 id="thisNumber"><%= @currentNumber %></h1>
-</div>
-<div class="navNumber">
-  <!--<h1 id="nextNumber"><%= @currentNumber+1 %><h1>-->
-  <h1 id="nextNumber">_<h1>
 </div>
