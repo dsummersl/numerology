@@ -9,7 +9,8 @@
     <% classParts = "numberType" %>
     <% if el: %>
       <% classParts += " active" if el.containsNumber @app.currentNumber %>
-      <div class="<%= classParts %>">
+      <% classParts += " selected" if @subselect.containsProp el %>
+      <div class="<%= classParts %>" id="<%= el.id %>">
         <p class="name"><%= el.name %></p>
         <p class="description"><%- el.description %></p>
       </div>

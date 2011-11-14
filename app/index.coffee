@@ -3,6 +3,7 @@ require('lib/setup')
 Spine = require('spine')
 
 TApp = require('models/App')
+SubSelect = require('models/SubSelect')
 NumberProperty = require('models/NumberProperty')
 CurrentNumber = require('controllers/CurrentNumber')
 CurrentDescs = require('controllers/CurrentDescs')
@@ -29,9 +30,9 @@ class App extends Spine.Controller
 
   dataloaded: (d) =>
     TApp.create(currentNumber: 29)
+    SubSelect.create()
     for k,v of d.tests
       NumberProperty.create(name: d.tests[k].name,description: d.tests[k].description, test: d.tests[k].test, numbers: d.tests[k].numbers)
-    TApp.selectAllNumberProperties()
     @cn = new CurrentNumber({el: $(@el).find('#currentNumber')})
     @cd = new CurrentDescs({el: $(@el).find('#currentDescs')})
     @ns = new NumberSelector({el: $(@el).find('#numberSelector')})

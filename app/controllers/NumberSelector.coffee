@@ -1,4 +1,5 @@
 App = require('models/App')
+SubSelect = require('models/SubSelect')
 Spine = require('spine')
 NumberProperty = require('models/NumberProperty')
 require('d3/d3')
@@ -15,6 +16,7 @@ class NumberSelector extends Spine.Controller
   constructor: ->
     super
     App.bind("update",@updated3)
+    SubSelect.bind("update",@updatesubselect)
     @width = 940
     @height = 100
     $(@el).empty()
@@ -69,6 +71,13 @@ class NumberSelector extends Spine.Controller
       .attr('fill','none')
       .attr('width','1.5px')
 
+  updatesubselect: =>
+    # TODO I have to redraw the entire thing most likely...it would be nice if
+    # I could still do the association somehow...  OH....I could do something
+    # creative with the keys: make a composite key that is both the number and
+    # whether it is 'in' the last selection or not.
+    @updated3()
+
   updated3: =>
     @top.updated3()
     @bottom.updated3()
@@ -89,13 +98,15 @@ class Timeline
     @doenter(@viz.selectAll('rect').data(@view.dataView(), (d) -> d.name ))
     if @showNumbers
       @viz.selectAll('text')
-        .data(@view.viewport) # first number goes to the left, the other goes to the right
+        .data(@view.viewport,@datafunction) # first number goes to the left, the other goes to the right
         .enter()
         .append('svg:text')
         .attr("transform", (d,i) => "translate(#{if i == 0 then 0 else @width},#{@height/2+15})")
         .attr('class','numberbartext')
         .attr('text-anchor',(d,i) => if i == 0 then 'after' else 'end')
         .text(String)
+
+  datafunction: (d) -> d.name
 
   doenter: (rect,delta=0) =>
     rect.enter()
@@ -117,12 +128,12 @@ class Timeline
 
     if @showNumbers
       @viz.selectAll('text')
-        .data(@view.viewport) # first number goes to the left, the other goes to the right
+        .data(@view.viewport,@datafunction)
         .transition()
         .text(String)
 
     rects = @viz.selectAll('rect')
-      .data(@view.dataView(), (d) -> d.name )
+      .data(@view.dataView(),@datafunction)
 
     rects.transition()
       .duration(medelay)
