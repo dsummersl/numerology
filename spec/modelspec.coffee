@@ -1,8 +1,9 @@
 Spine = require 'spine'
-NumberProperty = require '../app/models/NumberProperty'
+NumberProperty = require 'models/NumberProperty'
 
 describe 'NumberProperty', ->
   Spine.Model.Local = {}
+  np.destroy() for np in NumberProperty.all()
   NumberProperty.create(name: 'Even', description: '', test: "result = n % 2 == 0",numbers: null)
   NumberProperty.create(name: 'Odd', description: '', test: "result = n % 2 != 0",numbers: null)
   NumberProperty.create(name: 'HardCoded', description: '', test: null,numbers: [1,2,3,5,7,11])

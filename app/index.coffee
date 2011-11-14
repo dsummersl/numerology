@@ -28,9 +28,10 @@ class App extends Spine.Controller
     $.getJSON("data/computed.json", @dataloaded)
 
   dataloaded: (d) =>
-    app = TApp.create(currentNumber: 29)
+    TApp.create(currentNumber: 29)
     for k,v of d.tests
-      app.numberProperties().create(name: d.tests[k].name,description: d.tests[k].description, test: d.tests[k].test, numbers: d.tests[k].numbers)
+      NumberProperty.create(name: d.tests[k].name,description: d.tests[k].description, test: d.tests[k].test, numbers: d.tests[k].numbers)
+    TApp.selectAllNumberProperties()
     @cn = new CurrentNumber({el: $(@el).find('#currentNumber')})
     @cd = new CurrentDescs({el: $(@el).find('#currentDescs')})
     @ns = new NumberSelector({el: $(@el).find('#numberSelector')})

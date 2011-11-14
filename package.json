@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "dependencies": { 
     "serveup": "~0.0.2",
+    "jasmine-node": "~1.0.12",
     "hem": "~0.1.6",
     "d3": "~2.3.2",
     "es5-shimify": "~0.0.1",

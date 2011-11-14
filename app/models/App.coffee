@@ -1,9 +1,8 @@
 Spine = require('spine')
-#NumberProperty = require('models/NumberProperty')
+NumberProperty = require('models/NumberProperty')
 
 class App extends Spine.Model
-  @configure 'App','currentNumber'
-  #@hasMany 'numberProperties', 'models/NumberProperty'
+  @configure 'App','currentNumber', 'numProps'
   
   @increment: (n=1) ->
     current = @first()
@@ -23,5 +22,20 @@ class App extends Spine.Model
     current.save()
 
   @num: -> @first().currentNumber
+
+  @selectAllNumberProperties: ->
+    f = @first()
+    f.numProps = (n.id for n in NumberProperty.all())
+    f.save()
+
+  @setSelectedNumberProperty: (np) ->
+    f = @first()
+    f.numProps = [np.id]
+    f.save()
+
+  @addToSelectedNumberProperty: (np) ->
+    f = @first()
+    f.numProps.push np.id
+    f.save()
 
 module.exports = App
