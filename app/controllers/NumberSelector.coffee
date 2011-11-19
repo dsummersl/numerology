@@ -39,11 +39,11 @@ class NumberSelector extends Spine.Controller
     @top = new Timeline(@width-@topMargin*2,@height/2,topG,NumberProperty.makeDataView(10))
     @bottom = new Timeline(@width-@bottomMargin*2,@height/2,bottomG,NumberProperty.makeDataView(100),true)
     @connector = new TimelineConnector(@top,@bottom,@topMargin,@bottomMargin,viz.data([0]).append('svg:g'))
-    App.bind("update",@updated3)
-    SubSelect.bind("update",@updatesubselect)
+    App.bind("update",@updateRanges)
+    SubSelect.bind("update",@updateSelects)
 
-  updatesubselect: => @updated3()
-  updated3: => @connector.updated3()
+  updateSelects: => @connector.updateSelects()
+  updateRanges: => @connector.updateRanges()
 
 class TimelineConnector# {{{
   constructor: (@top,@bottom,@topMargin,@bottomMargin,@viz) ->
@@ -80,9 +80,13 @@ class TimelineConnector# {{{
       .attr('fill','none')
       .attr('width','1.5px')
 
-  updated3: =>
-    @top.updated3()
-    @bottom.updated3()
+  updateSelects: =>
+    @top.updateSelects()
+    @bottom.updateSelects()
+
+  updateRanges: =>
+    @top.updateRanges()
+    @bottom.updateRanges()
     @viz.selectAll('path')
       .data(@joinData())
       .transition()
@@ -99,7 +103,9 @@ class Timeline# {{{
     #@npcolors = d3.scale.linear().domain(np.name for np in NumberProperty.all()).range([0,1])
     @yoffset = 5
     @delay = 400
-    @doenter(@viz.selectAll('g').data(@view.dataView(), @datafunction))
+    @oldSS = SubSelect.getNumberProperties()
+    @oldDV = @view.dataView()
+    @doenter(@viz.selectAll('g').data(@oldDV, @datafunction))
     if @showNumbers
       @viz.selectAll('text')
         .data(@view.viewport) # first number goes to the left, the other goes to the right
@@ -110,25 +116,28 @@ class Timeline# {{{
         .attr('text-anchor',(d,i) => if i == 0 then 'after' else 'end')
         .text(String)
 
-  # TODO I have to redraw the entire thing most likely...it would be nice if
-  # I could still do the association somehow...  OH....I could do something
-  # creative with the keys: make a composite key that is both the number and
-  # whether it is 'in' the last selection or not.
-  #
-  # An index key might be... <thenumber>-<thecategoryname>-<thecountforthecategory>
   datafunction: (d) -> d.name
 
+  makeFill: (d) ->
+    val = 1
+    val = 1-@colors(d.count) if d.offset != 0
+    sat = 0
+    hue = 0
+    if SubSelect.containsNumber(d.name)
+      val = .97 if d.offset == 0
+      sat = .1
+      hue = 120
+    return d3.hsl(hue,sat,val)
+
   doenter: (rect,delta=0) =>
-    ss = SubSelect.getNumberProperties()
     heightPerNP = Math.floor((@height/2-@yoffset) / NumberProperty.all().length)
     rect.enter()
       .append('svg:g')
       .selectAll('rect')
-      .data((d)=> NumberProperty.breakoutParts(d,ss))
+      .data((d)=> NumberProperty.breakoutParts(d,@oldSS))
       .enter()
       .append('svg:rect')
-      .attr('fill',(d,i) => if d.offset == 0 then d3.hsl(0,0,1) else d3.hsl(0,0,1-@colors(d.count)))
-      #.attr('name', (d) => "#{d.name} - #{d.property} - #{d.count} - #{d.offset} - #{heightPerNP}")
+      .attr('fill',(d,i) => @makeFill(d))
       .attr('x', (d) => @x(d.name-@view.viewport[0]+delta))
       .attr('y', (d) => (@yoffset+d.offset*heightPerNP))
       .attr('class', (d) => if d.name == App.num() then 'selectedWedge' else 'unselectedWedge')
@@ -136,11 +145,27 @@ class Timeline# {{{
       .attr('height', (d) => heightPerNP*d.count)
       .on('click', (d) => App.set(d.name))
 
-  updated3: =>
-    ss = SubSelect.getNumberProperties()
+  updateSelects: =>
+    # make a number range that just corresponds to the selected numbers
+    # then do a transition on their color only
+    toUpdate = []
+    for i in @oldDV
+      toUpdate.push(i) if SubSelect.containsNumber(i.name,(s.id for s in @oldSS)) != SubSelect.containsNumber(i.name)
+    #console.log "after looking things over I need to update #{toUpdate.length}: #{p.name for p in toUpdate}"
+    @oldSS = SubSelect.getNumberProperties()
+    rects = @viz.selectAll('g')
+      .data(toUpdate,@datafunction)
+    rects.selectAll('rect')
+      .data((d)=> NumberProperty.breakoutParts(d,@oldSS))
+      .transition()
+      .duration(@delay)
+      .attr('fill',(d) => @makeFill(d))
+
+  updateRanges: =>
     heightPerNP = Math.floor((@height/2-@yoffset) / NumberProperty.all().length)
     oldstart = @view.viewport[0]
     @view.recenter(App.num())
+    @oldDV = @view.dataView()
     delta = Math.abs(@view.viewport[0] - oldstart)
     change = if oldstart < @view.viewport[0] then delta else -delta
     medelay = if change > @view.size then @delay * 2 else @delay
@@ -152,10 +177,10 @@ class Timeline# {{{
         .text(String)
 
     rects = @viz.selectAll('g')
-      .data(@view.dataView(),@datafunction)
+      .data(@oldDV,@datafunction)
 
     rects.selectAll('rect')
-      .data((d)=> NumberProperty.breakoutParts(d,ss))
+      .data((d)=> NumberProperty.breakoutParts(d,@oldSS))
       .transition()
       .duration(medelay)
       .attr('x', (d) => @x(d.name-@view.viewport[0]))
@@ -166,7 +191,7 @@ class Timeline# {{{
     if change != 0
       rects.exit()
         .selectAll('rect')
-        .data((d)=> NumberProperty.breakoutParts(d,ss))
+        .data((d)=> NumberProperty.breakoutParts(d,@oldSS))
         .transition()
         .duration(medelay)
         .attr('x', (d) => @x(d.name-@view.viewport[0]))
