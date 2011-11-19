@@ -29,6 +29,11 @@ describe 'NumberProperty', ->
     it 'can compute ranges of numbers', ->
       expect(NumberProperty.totalCount(2,3)).toEqual(4)
       expect(NumberProperty.totalCount(2,5)).toEqual(7)
+    it 'should let you send a subset of properties', ->
+      expect(NumberProperty.totalCount(5,5,[NumberProperty.first()])).toEqual(0)
+      expect(NumberProperty.totalCount(8,8,[NumberProperty.first()])).toEqual(1)
+      expect(NumberProperty.totalCount(2,3,[NumberProperty.first()])).toEqual(1)
+      expect(NumberProperty.totalCount(2,5,[NumberProperty.first()])).toEqual(2)
 
   describe 'makeCountList', ->
     it 'should return the counts/numbers in a range', ->
@@ -36,15 +41,23 @@ describe 'NumberProperty', ->
       expect(list.length).toEqual(5)
       expect(list[0].name).toEqual(1)
       expect(list[0].value).toEqual(2)
+    it 'should let you send a subset of properties', ->
+      list = NumberProperty.makeCountList(1,5,[NumberProperty.first()])
+      expect(list.length).toEqual(5)
+      expect(list[0].name).toEqual(1)
+      expect(list[0].value).toEqual(0)
+      expect(list[1].name).toEqual(2)
+      expect(list[1].value).toEqual(1)
 
   describe 'makeDataView', ->
-    list = NumberProperty.makeCountList(1,20)
-    data = NumberProperty.makeDataView(list,10)
+    data = NumberProperty.makeDataView(10,20)
 
     it 'will default to 1-size and will not move at the ends', ->
       expect(data.center).toEqual(1)
       expect(data.viewport).toEqual([1,10])
-      expect(d.name for d in data.dataView()).toEqual([1,2,3,4,5,6,7,8,9,10])
+      expect(d.name for d in data.dataView()).toEqual( [1,2,3,4,5,6,7,8,9,10])
+      expect(d.total for d in data.dataView()).toEqual([2,2,2,1,2,1,2,1,1,1])
+      expect(data.dataView()[0].properties).toEqual(['Odd','HardCoded'])
       data.recenter(2)
       expect(data.center).toEqual(2)
       expect(data.viewport).toEqual([1,10])
@@ -66,7 +79,7 @@ describe 'NumberProperty', ->
       expect(d.name for d in data.dataView()).toEqual([5,6,7,8,9,10,11,12,13,14])
 
     it 'will move correctly if the viewport is odd', ->
-      data = NumberProperty.makeDataView(list,11)
+      data = NumberProperty.makeDataView(11,20)
       data.recenter(10)
       expect(data.center).toEqual(10)
       expect(data.viewport).toEqual([5,15])
@@ -74,3 +87,36 @@ describe 'NumberProperty', ->
       data.recenter(18)
       expect(data.viewport).toEqual([10,20])
 
+  describe 'breakoutParts', ->
+    data = NumberProperty.makeDataView(10,20)
+    it 'a number with 2 props', ->
+      part = NumberProperty.breakoutParts(data.dataView()[0])
+      expect(part.length).toEqual(2)
+      expect(part[0]).toEqual({
+        name: 1
+        count: 1
+        offset: 0
+        property: 'notaprop'
+      })
+      expect(part[1]).toEqual({
+        name: 1
+        count: 2
+        offset: 1
+        property: 'aprop'
+      })
+    it 'a number with 1 part', ->
+      data.recenter(10)
+      part = NumberProperty.breakoutParts(data.dataView()[7])
+      expect(part.length).toEqual(2)
+      expect(part[0]).toEqual({
+        name: 12
+        count: 2
+        offset: 0
+        property: 'notaprop'
+      })
+      expect(part[1]).toEqual({
+        name: 12
+        count: 1
+        offset: 2
+        property: 'aprop'
+      })

@@ -1,4 +1,5 @@
 Spine = require('spine')
+Util = require('lib/util')
 
 class NumberProperty extends Spine.Model
   @configure 'NumberProperty','name','description','test','numbers'
@@ -18,30 +19,58 @@ class NumberProperty extends Spine.Model
   # the total number of properties that this #
   # has. In the case of a range, it would give you
   # the total in the range
-  @totalCount: (first,last = -1) ->
+  @totalCount: (first,last = -1,nps=@all()) ->
     if last < first
       last = first
     count = 0
-    for el in @all()
+    for el in nps
       r = first
       while r <= last
         count++ if el.containsNumber(r++)
     return count
- 
+
   # get a list of the number/count and group numbers into bins (in which case things would be averaged).
   # TODO un-implemented grouping
-  @makeCountList: (first,last,grouping=1) ->
+  @makeCountList: (first,last,nps=@all()) ->
     n = first
     results = []
     while n <= last
       newval =
         name: n
-        value: @totalCount(n)
+        value: @totalCount(n,n,nps)
       results.push(newval)
       n++
     return results
 
-  @makeDataView: (data,size) -> new BoundedRange(data,size)
+  # make a view that is 'size' points wide, and looks over a total data of length 'len'.
+  @makeDataView: (size,len) -> new BoundedRange(size,len)
+
+  # provide a dictionary of a numer, and its total number of properties, and what they are.
+  @makeTotalView: (n,nps=@all()) ->
+    result = {}
+    result.name = n
+    result.total=0
+    result.properties=[]
+    for np in nps
+      if np.containsNumber(n)
+        result.total++
+        result.properties.push(np.name)
+    return result
+
+  # takes a dictionary that would have crom from the makeDataView.dataView array (and makeTotalView):
+  @breakoutParts: (d) ->
+    # TODO instead of passing in several data sets here, just pass in the coloring rules:
+    #  - each set will be colored this way...(rainbow, starting with gray?)
+    count = 0
+    count++ for ss in NumberProperty.all() when ss.containsNumber(d.name)
+
+    # count = count of this bucket
+    # offset = bucket number
+    results = []
+    results.push({name:d.name, count:NumberProperty.all().length-count, offset: 0, property:'notaprop'})
+    results.push({name:d.name, count:count, offset: NumberProperty.all().length-count, property:'aprop'})
+    return results
+
 
 # A class that stores a list of data, and then gives you a 'view' of it, and provides a center
 #
@@ -50,12 +79,16 @@ class NumberProperty extends Spine.Model
 #  - viewport: a range always equal to size.
 #  - center: where the main view is in the middle of the viewport.
 class BoundedRange
-  # defaults the v
-  constructor: (@data,@size) ->
+  constructor: (@size,@length) ->
     @viewport = [1,@size]
     @center = 1
 
-  dataView: -> @data[@viewport[0]-1..@viewport[1]-1]
+  # return a list of views, each list is the count for each individual property
+  # keys:
+  #   name: the number
+  #   total: total count
+  #   properties: list of the NumberProperty name fields that are applicable to this number
+  dataView: -> NumberProperty.makeTotalView(el) for el in Util.range(@viewport[0],@viewport[1])
 
   recenter: (n) ->
     @center = n
@@ -63,9 +96,10 @@ class BoundedRange
     end = @size
     start = n-Math.floor(@size/2) if n > @size/2
     end = n+Math.ceil(@size/2)-1 if n > @size/2
-    if end > @data.length
-      start = @data.length - @size + 1
-      end = @data.length
+    if end > @length
+      start = @length - @size + 1
+      end = @length
     @viewport = [start,end]
+
 
 module.exports = NumberProperty
