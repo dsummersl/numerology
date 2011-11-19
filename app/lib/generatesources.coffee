@@ -1,7 +1,7 @@
 #BloomFilter = require('bloomjs')
 
 #max = 10000
-max = 5000
+max = 10000
 range = [1..max]
 
 # http://en.wikibooks.org/wiki/Efficient_Prime_Number_Generating_Algorithms# {{{

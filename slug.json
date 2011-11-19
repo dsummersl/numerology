@@ -13,5 +13,8 @@
     "spine/lib/relation",
     "spine/lib/manager"
   ],
-  "libs": [ ]
+  "libs": [
+    "lib/bootstrap-twipsy.js",
+    "lib/bootstrap-popover.js"
+  ]
 }

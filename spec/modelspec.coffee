@@ -89,34 +89,34 @@ describe 'NumberProperty', ->
 
   describe 'breakoutParts', ->
     data = NumberProperty.makeDataView(10,20)
-    it 'a number with 2 props', ->
+    it 'is a number with 2 props', ->
       part = NumberProperty.breakoutParts(data.dataView()[0])
       expect(part.length).toEqual(2)
       expect(part[0]).toEqual({
         name: 1
-        count: 1
+        count: 0
         offset: 0
         property: 'notaprop'
       })
       expect(part[1]).toEqual({
         name: 1
-        count: 2
-        offset: 1
+        count: 3
+        offset: 0
         property: 'aprop'
       })
-    it 'a number with 1 part', ->
+    it 'is a number with 1 part', ->
       data.recenter(10)
       part = NumberProperty.breakoutParts(data.dataView()[7])
       expect(part.length).toEqual(2)
       expect(part[0]).toEqual({
         name: 12
-        count: 2
+        count: 1
         offset: 0
         property: 'notaprop'
       })
       expect(part[1]).toEqual({
         name: 12
-        count: 1
-        offset: 2
+        count: 2
+        offset: 1 
         property: 'aprop'
       })

@@ -59,16 +59,15 @@ class NumberProperty extends Spine.Model
 
   # takes a dictionary that would have crom from the makeDataView.dataView array (and makeTotalView):
   @breakoutParts: (d) ->
-    # TODO instead of passing in several data sets here, just pass in the coloring rules:
-    #  - each set will be colored this way...(rainbow, starting with gray?)
     count = 0
     count++ for ss in NumberProperty.all() when ss.containsNumber(d.name)
 
     # count = count of this bucket
     # offset = bucket number
     results = []
+    count = if count*2 > NumberProperty.all().length then NumberProperty.all().length else count*2
     results.push({name:d.name, count:NumberProperty.all().length-count, offset: 0, property:'notaprop'})
-    results.push({name:d.name, count:count, offset: NumberProperty.all().length-count, property:'aprop'})
+    results.push({name:d.name, count:count, offset: results[0].count, property:'aprop'})
     return results
 
 
