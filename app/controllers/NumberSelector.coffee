@@ -15,10 +15,6 @@ two horizontal histograms:
 class NumberSelector extends Spine.Controller
   constructor: ->
     super
-
-    # TODO unset this - just for testing:
-    SubSelect.setSelectedNumberProperty NumberProperty.findByAttribute('name','Prime')
-
     @width = 940
     @height = 100
     $(@el).empty()
@@ -36,8 +32,8 @@ class NumberSelector extends Spine.Controller
     bottomG = viz.data([0])
       .append('svg:g')
       .attr('transform', "translate(#{@bottomMargin},#{@height/2})")
-    @top = new Timeline(@width-@topMargin*2,@height/2,topG,NumberProperty.makeDataView(10))
-    @bottom = new Timeline(@width-@bottomMargin*2,@height/2,bottomG,NumberProperty.makeDataView(100),true)
+    @top = new Timeline(@width-@topMargin*2,@height/2,topG,NumberProperty.makeDataView(26))
+    @bottom = new Timeline(@width-@bottomMargin*2,@height/2,bottomG,NumberProperty.makeDataView(500),true)
     @connector = new TimelineConnector(@top,@bottom,@topMargin,@bottomMargin,viz.data([0]).append('svg:g'))
     App.bind("update",@updateRanges)
     SubSelect.bind("update",@updateSelects)
@@ -103,6 +99,7 @@ class Timeline# {{{
     #@npcolors = d3.scale.linear().domain(np.name for np in NumberProperty.all()).range([0,1])
     @yoffset = 5
     @delay = 400
+    @heightPerNP = Math.floor((@height/2-@yoffset) / SubSelect.numberOfContains(1,(i.id for i in NumberProperty.all())))
     @oldSS = SubSelect.getNumberProperties()
     @oldDV = @view.dataView()
     @doenter(@viz.selectAll('g').data(@oldDV, @datafunction))
@@ -119,18 +116,21 @@ class Timeline# {{{
   datafunction: (d) -> d.name
 
   makeFill: (d) ->
-    val = 1
-    val = 1-@colors(d.count) if d.offset != 0
+    lum = 1
+    lum = .98-@colors(d.count) if d.offset != 0
     sat = 0
-    hue = 0
-    if SubSelect.containsNumber(d.name)
-      val = .97 if d.offset == 0
-      sat = .1
-      hue = 120
-    return d3.hsl(hue,sat,val)
+    hue = 60
+    numContains = SubSelect.numberOfContains(d.name)
+    if numContains > 0 && numContains == SubSelect.first().numProps.length
+      numContains = 2
+      lum = (lum - .03*numContains) if d.offset == 0
+      sat = .08*numContains
+      hue = 240
+    return d3.hsl(hue,sat,lum)
 
   doenter: (rect,delta=0) =>
-    heightPerNP = Math.floor((@height/2-@yoffset) / NumberProperty.all().length)
+    # assuming that 1 has the most properties:
+
     rect.enter()
       .append('svg:g')
       .selectAll('rect')
@@ -139,10 +139,10 @@ class Timeline# {{{
       .append('svg:rect')
       .attr('fill',(d,i) => @makeFill(d))
       .attr('x', (d) => @x(d.name-@view.viewport[0]+delta))
-      .attr('y', (d) => (@yoffset+d.offset*heightPerNP))
+      .attr('y', (d) => (@yoffset+d.offset*@heightPerNP))
       .attr('class', (d) => if d.name == App.num() then 'selectedWedge' else 'unselectedWedge')
       .attr('width', @x(1))
-      .attr('height', (d) => heightPerNP*d.count)
+      .attr('height', (d) => @heightPerNP*d.count)
       .on('click', (d) => App.set(d.name))
 
   updateSelects: =>
@@ -150,7 +150,7 @@ class Timeline# {{{
     # then do a transition on their color only
     toUpdate = []
     for i in @oldDV
-      toUpdate.push(i) if SubSelect.containsNumber(i.name,(s.id for s in @oldSS)) != SubSelect.containsNumber(i.name)
+      toUpdate.push(i) if SubSelect.containsNumber(i.name,(s.id for s in @oldSS)) or SubSelect.containsNumber(i.name)
     #console.log "after looking things over I need to update #{toUpdate.length}: #{p.name for p in toUpdate}"
     @oldSS = SubSelect.getNumberProperties()
     rects = @viz.selectAll('g')
@@ -162,7 +162,6 @@ class Timeline# {{{
       .attr('fill',(d) => @makeFill(d))
 
   updateRanges: =>
-    heightPerNP = Math.floor((@height/2-@yoffset) / NumberProperty.all().length)
     oldstart = @view.viewport[0]
     @view.recenter(App.num())
     @oldDV = @view.dataView()
@@ -184,8 +183,8 @@ class Timeline# {{{
       .transition()
       .duration(medelay)
       .attr('x', (d) => @x(d.name-@view.viewport[0]))
-      .attr('y', (d) => (@yoffset+d.offset*heightPerNP))
-      .attr('height', (d) => heightPerNP*d.count)
+      .attr('y', (d) => (@yoffset+d.offset*@heightPerNP))
+      .attr('height', (d) => @heightPerNP*d.count)
       .attr('class', (d) => if d.name == App.num() then 'selectedWedge' else 'unselectedWedge')
 
     if change != 0
