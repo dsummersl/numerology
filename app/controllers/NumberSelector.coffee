@@ -24,16 +24,16 @@ class NumberSelector extends Spine.Controller
       .attr("width", @width)
       .attr("height", @height)
       .attr("class", "rangeSelector")
-    @topMargin = 120
-    @bottomMargin = 10
+    @topMargin = 225
+    @bottomMargin = 100
     topG = viz.data([0])
       .append('svg:g')
       .attr('transform', "translate(#{@topMargin},#{0})")
     bottomG = viz.data([0])
       .append('svg:g')
       .attr('transform', "translate(#{@bottomMargin},#{@height/2})")
-    @top = new Timeline(@width-@topMargin*2,@height/2,topG,NumberProperty.makeDataView(26))
-    @bottom = new Timeline(@width-@bottomMargin*2,@height/2,bottomG,NumberProperty.makeDataView(500),true)
+    @top = new Timeline(@width-@topMargin*2,@height/2,topG,NumberProperty.makeDataView(41))
+    @bottom = new Timeline(@width-@bottomMargin*2,@height/2,bottomG,NumberProperty.makeDataView(400),true)
     @connector = new TimelineConnector(@top,@bottom,@topMargin,@bottomMargin,viz.data([0]).append('svg:g'))
     App.bind("update",@updateRanges)
     SubSelect.bind("update",@updateSelects)
