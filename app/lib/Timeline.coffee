@@ -83,8 +83,8 @@ class Timeline# {{{
     numContains = SubSelect.numberOfContains(d.name)
     if numContains > 0 && numContains == SubSelect.first().numProps.length
       numContains = 2
-      lum = (lum - .03*numContains) if d.offset == 0
-      sat = .08*numContains
+      lum = (lum - .04*numContains) if d.offset == 0
+      sat = .09*numContains
       hue = 240
     return d3.hsl(hue,sat,lum)
 

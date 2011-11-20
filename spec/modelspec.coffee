@@ -117,6 +117,6 @@ describe 'NumberProperty', ->
       expect(part[1]).toEqual({
         name: 12
         count: 2
-        offset: 1 
+        offset: 1
         property: 'aprop'
       })
