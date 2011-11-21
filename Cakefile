@@ -6,3 +6,9 @@ task 'test','Run unit tests', (options) ->
     console.log stdout
     console.log stderr
     #console.log error if error != null
+
+task 'nums','Make numbers for data files', (options)->
+  exec 'NODE_PATH="app" coffee app/lib/generatesources.coffee > public/data/computed.json', (error,stdout,stderr) ->
+    console.log stdout
+    console.log stderr
+    #console.log error if error != null

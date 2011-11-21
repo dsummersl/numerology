@@ -23,3 +23,8 @@ describe 'BloomFilter', ->
     cnt=0
     expect(bf.contains("k#{cnt++}")).toBeTruthy() while cnt < 10
     # TODO test a false positive...
+
+  it 'has a copy constructor', ->
+    bf2 = new BloomFilter(bf.capacity,bf.errorRate,bf.filter,bf.count)
+    cnt=0
+    expect(bf.contains("k#{cnt++}")).toBeTruthy() while cnt < 10

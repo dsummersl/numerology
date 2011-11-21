@@ -1,8 +1,8 @@
 Spine = require('spine')
 
 class App extends Spine.Model
-  @configure 'App','currentNumber'
-  
+  @configure 'App','currentNumber','bloom'
+
   @increment: (n=1) ->
     current = @first()
     current.currentNumber += n

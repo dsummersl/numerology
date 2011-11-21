@@ -1,30 +1,18 @@
-SHA1 = require 'sha1'
+SHA1 = require('crypto/sha1').hex_sha1
 
 ###
 # A bloom filter hash map (http://en.wikipedia.org/wiki/Bloom_filter).
 ###
 class BloomFilter
-  constructor: (@capacity=100,@errorRate=.01)->
+  constructor: (@capacity=100,@errorRate=.01,@filter=null,@count=0)->
+    console.log("start #{@capacity} #{@errorRate} ")
     bitsPerKey = Math.log(1/@errorRate)*Math.log(Math.E)
+    filterLength = parseInt(bitsPerKey*@capacity)
     #console.log "error rate #{@errorRate} requires #{bitsPerKey} bits per key. Capacity #{@capacity} then needs: #{bitsPerKey*@capacity} bits"
-    @count = 0
 
-    ###
-    lowest_m = null
-    best_k = 1
-    k = 1
-    while k <= 100
-      m = (-1 * k * @capacity) / ( Math.log( 1 - Math.pow(@errorRate, (1/k)) ))
-      if lowest_m == null || (m < lowest_m)
-        lowest_m = m
-        best_k   = k
-      k++
-    lowest_m = Math.floor(lowest_m) + 1
-    ###
-
-    @filterLength = parseInt(bitsPerKey*@capacity)
-    #console.log("filter len = #{@filterLength}")
-    @filter = new Array(@filterLength)
+    if not @filter
+      #console.log("filter len = #{filterLength}")
+      @filter = new Array(filterLength)
 
   computeHash: (k) ->
     hash=SHA1(k)
@@ -37,7 +25,7 @@ class BloomFilter
       vec = vec ^ c
       j=j+8
     #console.log "vec = #{vec}"
-    return Math.abs(vec % @filterLength)
+    return Math.abs(vec % @filter.length)
 
   add: (k) ->
     # and int has 2^54 = 2^9*6

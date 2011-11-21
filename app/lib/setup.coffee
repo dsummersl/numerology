@@ -2,6 +2,8 @@ require('json2ify')
 require('es5-shimify')
 require('jqueryify')
 
+require('crypto/sha1')
+
 require('spine')
 require('spine/lib/local')
 require('spine/lib/ajax')

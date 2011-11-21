@@ -1,5 +1,6 @@
 Spine = require('spine')
 Util = require('lib/util')
+App = require('models/App')
 
 class NumberProperty extends Spine.Model
   @configure 'NumberProperty','name','description','test','numbers'
@@ -10,6 +11,8 @@ class NumberProperty extends Spine.Model
   ###
 
   containsNumber: (n) ->
+    return App.first().bloom.contains("#{@name}-#{n}") if App.first().bloom
+
     if @numbers and @numbers.length > 0
       return n in @numbers
     else
