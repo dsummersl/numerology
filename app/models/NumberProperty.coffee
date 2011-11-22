@@ -11,7 +11,9 @@ class NumberProperty extends Spine.Model
   ###
 
   containsNumber: (n) ->
-    return App.first().bloom.contains("#{@name}-#{n}") if App.first().bloom
+    if App.first().bloom
+      #console.log "#{@name}-#{n} = #{App.first().bloom.contains("#{@name}-#{n}")}"
+      return App.first().bloom.contains("#{@name}-#{n}")
 
     if @numbers and @numbers.length > 0
       return n in @numbers

@@ -5,7 +5,6 @@ SHA1 = require('crypto/sha1').hex_sha1
 ###
 class BloomFilter
   constructor: (@capacity=100,@errorRate=.01,@filter=null,@count=0)->
-    console.log("start #{@capacity} #{@errorRate} ")
     bitsPerKey = Math.log(1/@errorRate)*Math.log(Math.E)
     filterLength = parseInt(bitsPerKey*@capacity)
     #console.log "error rate #{@errorRate} requires #{bitsPerKey} bits per key. Capacity #{@capacity} then needs: #{bitsPerKey*@capacity} bits"
@@ -28,24 +27,25 @@ class BloomFilter
     return Math.abs(vec % @filter.length)
 
   add: (k) ->
-    # and int has 2^54 = 2^9*6
-    # total hash digits 2^4*40 = 2^160
-    # So with this hash of 40 digits we and 5 bits per key == 32 keys would maintain 1 percent error
-    # How many keys do I think I'll add? Well...there are maybe 30 properties times a billion numbers
-    #  k = # keys (1 billion * 30)
-    #  bitmap size = 30billion keys * 4.6 bits per key = 121 billion bits = 15 billion bytes = yikes
-    #  oh but hold on these keys will only be added if they exist for the number...
-    #  and most numbers appear to only have like 3 properties:
-    #  k = 1 billion * 3 => 3billion keys * 4.6 bit/key = 15 billion bits / 8 = 2 billion bytes. still yikes
-    #  what if it were really only 1 on average?
-    #  k = 1 billion * 1 => 1billion keys * 4.6 bit/key = 5 billion bits / 8 = 500 Mbytes. still yikes
-    # 8 hex digits = 2^4*8 = 2^32 ... 9 digits = 2^36, 10 digits = 2^40 ...
-    # STICK TO THE WIKI PAGE - its got lots of reference papers.
     @count++
     @filter[@computeHash(k)] = true
     return this
 
   contains: (k) -> return @filter[ @computeHash( k ) ] == true
+
+class VerifiableBloomFilter extends BloomFilter
+  constructor: (@capacity=100,@errorRate=.01,@filter=null,@count=0,@keys=[])->
+    super(@capacity,@errorRate,@filter,@count)
+
+  add: (k) ->
+    @keys.push(k)
+    super(k)
+
+  # return a list of keys that aren't in the bloom
+  verify: -> return for k in @keys when not @contains(k)
+
+  # convert this verifiable bloom into a normal one
+  makeBloomFilter: -> new BloomFilter(@capacity,@errorRate,@filter,@count)
 
 # TODO implement with bits instead of ints
 class BitArray
@@ -55,4 +55,6 @@ class BitArray
   size: -> @data.length
   set: (position,value) -> @data[position] = value
 
-module.exports = BloomFilter
+module.exports =
+  BloomFilter: BloomFilter
+  VerifiableBloomFilter: VerifiableBloomFilter

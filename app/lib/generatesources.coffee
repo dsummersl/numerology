@@ -1,4 +1,4 @@
-BloomFilter = require('lib/BloomFilter')
+Filters = require('lib/BloomFilter')
 
 #max = 10000
 max = 1000
@@ -282,7 +282,7 @@ tests = #{{{
     test: (n) -> n in [ 1, 36, 1225, 41616, 1413721, 48024900, 1631432881 ]
   automorphic:
     name: 'Automorphic'
-    description: 'It square "ends" in itself. Also called Curious.'
+    description: 'It\'s square "ends" in itself. Also called Curious.'
     computed: true
     oeis: 'http://oeis.org/A003226'
     test: (n) -> n in automorphics
@@ -302,23 +302,22 @@ generateTags = (n,tests,bf) ->
   for k,v of tests
     if tests[k].computed && tests[k].test(n)
       if bf != null
-        bf.add("#{k}-#{n}")
+        bf.add("#{tests[k].name}-#{n}")
       else
         tests[k].numbers.push(n)
 
-# TODO an optimization: I could use a bloom filter for each computed value...insert it into the bloom filter
-# and then after all the computations retest all the integers up to the max and see if there are any false->positives
-# and include with the bloom filter an 'exception list': numbers that say they are true, but aren't.
-
 tests[k].numbers = [] for k,v of tests
 
-bf = new BloomFilter(max*1.5)
+bf = new Filters.VerifiableBloomFilter(parseInt(max*1.45))
 generateTags(n,tests,bf) for n in range
-#console.log "Added #{bf.count} items to bloom filter"
+
+vs = bf.verify
+#console.log "missing keys: #{vs.length}"
+console.log "Key not in bloom: #{k}" for k in vs
 
 console.log JSON.stringify({
   tests: tests
-  bloom: bf
+  bloom: bf.makeBloomFilter()
 })
 
 # set vim: fdm=marker:
