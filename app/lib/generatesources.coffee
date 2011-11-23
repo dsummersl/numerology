@@ -1,7 +1,7 @@
 Filters = require('lib/BloomFilter')
 
 #max = 10000
-max = 1000
+max = 10
 range = [1..max]
 
 
@@ -305,19 +305,22 @@ generateTags = (n,tests,bf) ->
         bf.add("#{tests[k].name}-#{n}")
       else
         tests[k].numbers.push(n)
+checkTags = (n,tests,bf) ->
+  for k,v of tests
+    if tests[k].computed && tests[k].test(n)
+      console.log "ERROR: missing key '#{tests[k].name}-#{n}'" if not bf.has("#{tests[k].name}-#{n}")
+      #console.log "NOERR: Key '#{tests[k].name}-#{n}' " if bf.has("#{tests[k].name}-#{n}")
+    else
+      console.log "ERROR: key '#{tests[k].name}-#{n}' shows up but was never added" if bf.has("#{tests[k].name}-#{n}")
 
 tests[k].numbers = [] for k,v of tests
-
-bf = new Filters.VerifiableBloomFilter(parseInt(max*1.45))
+bf = new Filters.BloomFilter(1000)
 generateTags(n,tests,bf) for n in range
-
-vs = bf.verify
-#console.log "missing keys: #{vs.length}"
-console.log "Key not in bloom: #{k}" for k in vs
+checkTags(n,tests,bf) for n in range
 
 console.log JSON.stringify({
   tests: tests
-  bloom: bf.makeBloomFilter()
+  bloom: bf
 })
 
 # set vim: fdm=marker:
