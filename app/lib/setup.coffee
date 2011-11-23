@@ -3,6 +3,7 @@ require('es5-shimify')
 require('jqueryify')
 
 require('crypto/sha1')
+require('crypto/md5')
 
 require('spine')
 require('spine/lib/local')

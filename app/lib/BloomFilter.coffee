@@ -1,5 +1,5 @@
-SHA1 = require('crypto/sha1').hex_sha1
-MD5 = require('crypto/md5').hex_md5
+SHA1 = require('crypto/sha1').hex_hmac_sha1
+MD5 = require('crypto/md5').hex_hmac_md5
 
 ###
 # A bloom filter hash map (http://en.wikipedia.org/wiki/Bloom_filter).
@@ -73,17 +73,7 @@ class HashGenerator
 # This implementation is derived from 'Scalable Bloom Filters', http://en.wikipedia.org/wiki/Bloom_filter#CITEREFAlmeidaBaqueroPreguicaHutchison2007
 ###
 class SlicedBloomFilter
-  constructor: (@capacity=100,@errorRate=.005,@slices=null,@count=0)->
-    @allhashes = [
-      new HashGenerator((k)-> SHA1(k).slice(0,8)),
-      new HashGenerator((k)-> SHA1(k).slice(8,16)),
-      new HashGenerator((k)-> SHA1(k).slice(16,24)),
-      new HashGenerator((k)-> SHA1(k).slice(24,32)),
-      new HashGenerator((k)-> MD5(k).slice(0,8)),
-      new HashGenerator((k)-> MD5(k).slice(8,16)),
-      new HashGenerator((k)-> MD5(k).slice(16,24)),
-      new HashGenerator((k)-> MD5(k).slice(24,32))
-    ]
+  constructor: (@capacity=100,@errorRate=.001,@slices=null,@count=0)->
     @bitsPerInt = 32
     # P = p^k = @errorRate
     # n = @capacity
@@ -94,17 +84,26 @@ class SlicedBloomFilter
     # k = @slices
     # k = log2(1/P)
     @numSlices = Math.ceil(Math.log(1/@errorRate)/Math.log(2))
+    cnt = 0
+    @allhashes = []
+    while cnt++ < @numSlices
+      fnc = (cnt,k) -> (k)=>SHA1("h#{cnt}",k)
+      @allhashes.push(new HashGenerator(fnc(cnt)))
     #console.log("num slices = #{@numSlices} - #{@limit}")
     # m = M / k
     @sliceLen = Math.ceil(@limit / @numSlices)
-    @slices = []
-    for i in [0..@numSlices-1]
-      slice = []
-      cnt = 0
-      while cnt < @sliceLen
-        slice.push(0)
-        cnt += @bitsPerInt
-      @slices.push(slice)
+    if not @slices
+      @slices = []
+      for i in [0..@numSlices-1]
+        slice = []
+        cnt = 0
+        while cnt < @sliceLen
+          slice.push(0)
+          cnt += @bitsPerInt
+        @slices.push(slice)
+    throw "numSlices doesn't match slices" if @slices.length != @numSlices
+    throw "sliceLen doesn't match slice lengths: #{@sliceLen} !< #{@slices[0].length*@bitsPerInt}" if @slices[0].length*@bitsPerInt < @sliceLen
+
 
   computeIndexes: (bit) -> [Math.floor(bit / @bitsPerInt), Math.ceil(bit % @bitsPerInt)]
 

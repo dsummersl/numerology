@@ -38,5 +38,3 @@ describe 'BloomFilter', ->
     expect(bf.computeIndexes(1)).toEqual([0,1])
     expect(bf.computeIndexes(32)).toEqual([1,0])
     expect(bf.computeIndexes(35)).toEqual([1,3])
-###
-###

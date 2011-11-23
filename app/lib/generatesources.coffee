@@ -1,7 +1,7 @@
 Filters = require('lib/BloomFilter')
 
 #max = 10000
-max = 10
+max = 1000
 range = [1..max]
 
 

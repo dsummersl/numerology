@@ -30,7 +30,7 @@ class App extends Spine.Controller
     $.getJSON("data/computed.json", @dataloaded)
 
   dataloaded: (d) =>
-    TApp.create(currentNumber: 29,bloom: new Filters.BloomFilter(d.bloom.capacity,d.bloom.errorRate,d.bloom.filter,d.bloom.count))
+    TApp.create(currentNumber: 29,bloom: new Filters.BloomFilter(d.bloom.capacity,d.bloom.errorRate,d.bloom.slices,d.bloom.count))
     SubSelect.create()
     for k,v of d.tests
       NumberProperty.create(name: d.tests[k].name,description: d.tests[k].description, test: d.tests[k].test, numbers: d.tests[k].numbers)
