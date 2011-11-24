@@ -314,7 +314,7 @@ checkTags = (n,tests,bf) ->
       console.log "ERROR: key '#{tests[k].name}-#{n}' shows up but was never added" if bf.has("#{tests[k].name}-#{n}")
 
 tests[k].numbers = [] for k,v of tests
-bf = new Filters.BloomFilter(1000)
+bf = new Filters.ScalableBloomFilter(1000)
 generateTags(n,tests,bf) for n in range
 checkTags(n,tests,bf) for n in range
 
