@@ -12,3 +12,8 @@ task 'nums','Make numbers for data files', (options)->
     console.log stdout
     console.log stderr
     #console.log error if error != null
+
+task 'primes','Make primes', (options)->
+  exec 'NODE_PATH="app" coffee app/lib/genPrimes.coffee', (error,stdout,stderr) ->
+    console.log stdout
+    console.log stderr

@@ -18,6 +18,7 @@ class SlicedBloomFilter
     # M = @totalSize
     # M = n abs(ln P) / (ln2)^2
     @totalSize = Math.floor(@capacity * Math.abs(Math.log(@errorRate)) / Math.pow(Math.log(2),2))
+    throw "total size is bigger than an int! #{@totalSize}" if @totalSize < 0
     # k = @slices
     # k = log2(1/P)
     @numSlices = Math.ceil(Math.log(1/@errorRate)/Math.log(2))
@@ -80,7 +81,7 @@ class HashGenerator
   getIndex: (key,len) ->
     hash=@hashFunction(key)
     vec = 0
-    console.log("WARNING: watch out, I think this is too big.") if (len > Math.pow(2,16))
+    console.log("WARNING: watch out, I think this is too big. Key: '#{key}' Len: #{len}") if (len > Math.pow(2,31))
     # (2^4)^8
     hexCharsNeeded = parseInt(len / 4)
     c = parseInt(hash.slice(0, 8), 16)
