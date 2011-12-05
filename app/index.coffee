@@ -8,7 +8,7 @@ NumberProperty = require('models/NumberProperty')
 CurrentNumber = require('controllers/CurrentNumber')
 CurrentDescs = require('controllers/CurrentDescs')
 NumberSelector = require('controllers/NumberSelector')
-Filters = require('lib/BloomFilter')
+Filters = require('bloomfilters')
 
 #BloomFilter = require('bloomjs')
 

@@ -1,4 +1,4 @@
-Filters = require('lib/BloomFilter')
+Filters = require('bloomfilters')
 
 #max = 10000
 max = 1000
