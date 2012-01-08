@@ -1,32 +1,28 @@
-options = require 'lib/genOptions'
-Filters = require('bloomfilters')
-
-primeBuilder = (max) ->
-  bf = new Filters.ScalableBloomFilter(max/4)
-  #console.log "slices = #{bf.filters[0].sliceLen} && #{bf.filters[0].totalSize}"
-  nextPrime = (bf,prevPrime,max) ->
-    prevPrime += 2
-    prevPrime += 2 while not bf.has(prevPrime) and prevPrime < max
-    return prevPrime
-  bf.add(1)
-  bf.add(2)
-  bf.add(3)
-  console.log "1"
-  console.log "2"
-  console.log "3"
+### Generate primes up to 'max', and nontify the callback function 'listener' of the 
+# primes as they are discovered.
+# Return the total number found.
+###
+primeBuilder = (max,listener) ->
+  maxRoot = Math.sqrt(max)+1
+  primes = [3]
   potential = 3
+  listener(1)
+  listener(2)
+  listener(3)
+  cnt = 3
   while potential < max
     potential += 2
     sqrt_potential = Math.sqrt(potential)
     isprime = true
-    a = 3
-    while a < potential
-      #console.log "trying #{a}"
+    for a in primes
       break if a>sqrt_potential
       if potential % a == 0
         isprime = false
         break
-      a = nextPrime(bf,a,potential+1)
-    console.log "#{potential}" if isprime
+    if isprime
+      listener(potential)
+      cnt++
+      primes.push(potential) if potential < maxRoot
+  return cnt
 
-primeBuilder(options.max)
+module.exports = primeBuilder
