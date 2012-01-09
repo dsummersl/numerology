@@ -6,7 +6,7 @@
     "jasmine-node": "~1.0.12",
     "hem": "~0.1.6",
     "d3": "~2.3.2",
-    "bloomfilters": "~0.0.6",
+    "bloomfilters": "~0.0.10",
     "lazy": "~1.0.7",
     "es5-shimify": "~0.0.1",
     "json2ify": "~0.0.1",
