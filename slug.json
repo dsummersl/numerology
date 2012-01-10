@@ -5,7 +5,10 @@
     "jqueryify",
     "spine",
     "d3/d3",
-    "bloomfilers",
+
+    "bloomfilters",
+    "crypto/sha1",
+
     "spine/lib/local",
     "spine/lib/list",
     "spine/lib/ajax",

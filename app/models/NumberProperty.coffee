@@ -2,6 +2,10 @@ Spine = require('spine')
 Util = require('lib/util')
 App = require('models/App')
 
+###
+# Represents a type of property that a number can have. It'll tell you if the number has that property, what
+# numbers do, etc.
+###
 class NumberProperty extends Spine.Model
   @configure 'NumberProperty','name','description','test','numbers'
   
@@ -62,7 +66,7 @@ class NumberProperty extends Spine.Model
         result.properties.push(np.name)
     return result
 
-  # takes a dictionary that would have crom from the makeDataView.dataView array (and makeTotalView):
+  # takes a dictionary that would have come from the makeDataView.dataView array (and makeTotalView):
   @breakoutParts: (d) ->
     count = 0
     count++ for ss in NumberProperty.all() when ss.containsNumber(d.name)
@@ -81,6 +85,8 @@ class NumberProperty extends Spine.Model
 # Attributes:
 #  - data: the underlying data.
 #  - viewport: a range always equal to size.
+#  - size: the size of the viewport.
+#  - length: the max length that can be displayed at all (end of the sidewalk)
 #  - center: where the main view is in the middle of the viewport.
 class BoundedRange
   constructor: (@size,@length) ->
