@@ -1,6 +1,9 @@
 Spine = require('spine')
 NumberProperty = require('models/NumberProperty')
 
+###
+# A specific selection of numbers - a grouping that all belong to the same NumberProperty set.
+###
 class SubSelect extends Spine.Model
   @configure 'SubSelect', 'numProps'
 
