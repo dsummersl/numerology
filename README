@@ -1,4 +1,12 @@
-to compute the hard things:
+Numerology
+====
+
+An interactive graphic exploring various properties of the integer series.
+
+Details:
+====
+
+To compute the hard things:
 
 coffee app/lib/generatesources.coffee > public/data/computed.json 
 
