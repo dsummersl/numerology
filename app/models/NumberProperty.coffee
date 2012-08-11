@@ -10,16 +10,16 @@ BloomFilters = require('bloomfilters')
 # numbers do, etc.
 ###
 class NumberProperty extends Spine.Model
-	###
-	#
-	# 'name' - name of the property set
-	# 'description' - html description of the property for print.
-	# 'test' - if this exists, a simple test to ferret out numbers that belong to the set.
-	# 'numbers' - if its not easy to compute, a list of numbers.
-	# TODO convert 'numbers' to a BitSet - and all properties will have a 'test'
-	###
+  ###
+  #
+  # 'name' - name of the property set
+  # 'description' - html description of the property for print.
+  # 'test' - if this exists, a simple test to ferret out numbers that belong to the set.
+  # 'numbers' - if its not easy to compute, a list of numbers.
+  # TODO convert 'numbers' to a BitSet - and all properties will have a 'test'
+  ###
   @configure 'NumberProperty','name','description','test','numbers'
-  
+
   ###
   # Make a method that checks for the properties defined for a number
   # and return the list of properties
